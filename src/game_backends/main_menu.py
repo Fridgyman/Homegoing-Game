@@ -45,7 +45,7 @@ class MainMenuBackend(Backend):
                 game.ui_manager.add_text(Text("Made by: ", [255, 255, 255, 255],
                     self.bottom_pos + pygame.Vector2(0, -80), True, game.asset_manager.get_font("snake40")))
 
-                play_text: str = "Continue" if game.state_backends[GameState.PLAYING.value].is_setup else "Play"
+                play_text: str = "Continue" if game.state_backends[GameState.PLAYING].is_setup else "Play"
                 game.ui_manager.add_button(Button(Text(play_text, [255, 255, 255, 255],
                     self.center_pos + pygame.Vector2(0, 30), True, game.asset_manager.get_font("snake64")
                 ), pygame.Vector2(-40, 0), game.asset_manager.get_font("snake40"), [150, 0, 150, 255]))

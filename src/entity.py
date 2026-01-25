@@ -16,8 +16,9 @@ class Entity:
 
         self.collision: bool = collision
 
-    def set_sprite(self, sprite: Sprite):
+    def set_sprite(self, sprite: Sprite, hit_box: pygame.Vector2):
         self.sprite = sprite
+        self.hit_box = hit_box
 
     def get_collision(self, pos: pygame.Vector2) -> bool:
         return self.collision and \

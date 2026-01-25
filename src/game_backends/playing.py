@@ -50,6 +50,6 @@ class PlayingBackend(Backend):
     def render(self, game):
         game.scene_manager.render(game.window_surface, game.camera)
         game.ui_manager.render()
-        if self.fade != 0: self.overlay.fill((0, 0, 0, 255 - self.fade))
+        self.overlay.fill((0, 0, 0, 255 - self.fade))
         game.window_surface.blit(self.overlay, game.window_surface.get_rect())
         pygame.display.flip()

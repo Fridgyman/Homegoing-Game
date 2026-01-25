@@ -19,8 +19,7 @@ def parse_monologue(monologue_obj, asset_manager: AssetManager) -> Monologue:
         font=asset_manager.get_font(monologue_obj["font"]),
         next_monologue=None,
         options=None,
-        speaker_image=None if not monologue_obj["speaker_image"] else
-        asset_manager.get_image(monologue_obj["speaker_image"])
+        speaker_image=None if not monologue_obj["speaker_image"] else asset_manager.get_image(monologue_obj["speaker_image"])
     )
 
 
@@ -32,7 +31,7 @@ def parse_dialogue(dialogue_obj, asset_manager: AssetManager) -> Dialogue:
     for (monologue, obj) in zip(monologues, dialogue_obj["monologues"]):
         next_idx: int = obj.get("next_monologue")
         if next_idx is not None:
-            monologue.set_next_monologue(monologues[obj[next_idx]])
+            monologue.set_next_monologue(monologues[next_idx])
         for option in obj["options"]:
             monologue.add_option_monologue(option["text"], monologues[option["leads_to"]])
 

@@ -32,14 +32,22 @@ class Game:
         self.delta_time: float = 0
 
         self.state = game_state
-        self.state_backends = [MainMenuBackend(), PausedBackend(), PlayingBackend(),
-                               SceneBuilderBackend(), EntityConfigurerBackend()]
+        self.state_backends: dict = {
+            GameState.MAIN_MENU: MainMenuBackend(),
+            GameState.PAUSED: PausedBackend(),
+            GameState.PLAYING: PlayingBackend(),
+            GameState.SCENE_BUILDER: SceneBuilderBackend(),
+            GameState.ENTITY_CONFIGURER: EntityConfigurerBackend()
+        }
         self.backend = None
         self.next_backend = None
         self.set_backend(self.state)
 
     def set_backend(self, state: GameState):
-        self.next_backend = self.state_backends[state.value]
+        if state == GameState.QUITTING:
+            self.running = False
+            return
+        self.next_backend = self.state_backends[state]
         self.state = state
 
     def run(self, FPS: int, FPS_warn: int):

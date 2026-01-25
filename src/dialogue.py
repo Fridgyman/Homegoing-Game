@@ -40,6 +40,8 @@ class Monologue:
         self.choice_fade: int = 0
         self.choice_fading: int = 0
 
+        self.is_reset = True
+
     def line_finished(self) -> bool:
         return self.char_index[0] == self.char_index[1]
 
@@ -54,6 +56,8 @@ class Monologue:
         return self.options[choice][1]
 
     def reset(self):
+        if self.is_reset: return
+
         self.awaiting_choice = False
         self.spoken = ""
         self.line_index[0] = 0
@@ -64,6 +68,8 @@ class Monologue:
         self.fading: int = 0
         self.choice_fade: int = 0
         self.choice_fading: int = 0
+
+        self.is_reset = True
 
         for opt in self.options:
             opt[1].reset()
@@ -179,6 +185,7 @@ class Dialogue:
         self.playing = True
         self.fading = 1500
         self.current_monologue.fading = 1500
+        self.current_monologue.is_reset = False
 
     def reset(self):
         self.start_monologue.reset()
@@ -194,6 +201,7 @@ class Dialogue:
                 self.current_monologue = self.current_monologue.choose(self.choice_index)
                 self.current_monologue.fade = 255
                 self.current_monologue.fading = 0
+                self.current_monologue.is_reset = False
                 return
 
             new_monologue: Monologue | None = self.current_monologue.skip()
@@ -201,6 +209,7 @@ class Dialogue:
                 self.current_monologue = new_monologue
                 self.current_monologue.fade = 255
                 self.current_monologue.fading = 0
+                self.current_monologue.is_reset = False
             else:
                 self.playing = False
                 self.fading = -1024

@@ -65,7 +65,8 @@ class PausedBackend(Backend):
             game.set_backend(self.next_backend)
 
     def render(self, game):
-        self.overlay.fill((0, 0, 0, 255 - self.fade))
+        game.window_surface.fill((0, 0, 0))
+        if self.fade != 255: self.overlay.fill((0, 0, 0, 255 - self.fade))
         game.ui_manager.render()
         game.window_surface.blit(self.overlay, game.window_surface.get_rect())
         pygame.display.flip()
