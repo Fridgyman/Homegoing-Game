@@ -1,26 +1,31 @@
 import pygame
 
 class Text:
-    def __init__(self, text: str, color: pygame.Vector3, pos: pygame.Vector2, centered: bool, font: pygame.font.Font,
+    def __init__(self, text: str, color: list, pos: pygame.Vector2, centered: bool, font: pygame.font.Font,
                  dimensions: pygame.Vector2 | None = None):
         self.text: str = text
         self.font: pygame.font.Font = font
         self.centered: bool = centered
         self.pos: pygame.Vector2 = pos
-        self.color: pygame.Vector3 = color
+        self.color: list = color
 
         if centered:
             self.rect = self.font.render(text, True, color).get_rect(center=pos)
         else:
-            self.rect = pygame.Rect(self.pos, dimensions)
+            if dimensions is not None:
+                self.rect = pygame.Rect(self.pos, dimensions)
+            else:
+                self.rect = self.font.render(text, True, color).get_rect()
+                self.rect.x = self.pos.x
+                self.rect.y = self.pos.y
 
 class Button:
     def __init__(self, text: Text, select_pos: pygame.Vector2,
-                 select_font: pygame.font.Font, select_color: pygame.Vector3):
+                 select_font: pygame.font.Font, select_color: list):
         self.text: Text = text
         self.select_pos: pygame.Vector2 = select_pos
         self.select_font: pygame.font.Font = select_font
-        self.select_color: pygame.Vector3 = select_color
+        self.select_color: list = select_color
 
 
 class UIManager:
@@ -29,11 +34,27 @@ class UIManager:
         self.window_surface: pygame.Surface = window_surface
 
         self.dialogue = None
+        self.fade: int = 255
 
         self.text: list[Text] = []
         self.buttons: list[Button] = []
         self.choice: int = 0
         self.choice_move_block: bool = False
+
+    def set_text_fade(self, text_i: int, fade: int):
+        self.text[text_i].color[3] = fade
+
+    def set_button_fade(self, button_i: int, fade: int):
+        self.buttons[button_i].text.color[3] = fade
+        self.buttons[button_i].select_color[3] = fade
+
+    def set_text_fades(self, fade: int):
+        for i in range(len(self.text)):
+            self.set_text_fade(i, fade)
+
+    def set_button_fades(self, fade: int):
+        for i in range(len(self.buttons)):
+            self.set_button_fade(i, fade)
 
     def add_text(self, text: Text):
         self.text.append(text)
@@ -85,22 +106,26 @@ class UIManager:
 
         write = text.text
 
-        while write:
-            i: int = 1
+        lines = write.split("\n")
 
-            if y + font_height > rect.bottom:
-                break
+        for line in lines:
+            while line:
+                i: int = 1
 
-            while text.font.size(write[:i])[0] < rect.width and i < len(write):
-                i += 1
+                if y + font_height > rect.bottom:
+                    break
 
-            if i < len(write):
-                i = write.rfind(" ", 0, i) + 1
+                while text.font.size(line[:i])[0] < rect.width and i < len(line):
+                    i += 1
 
-            img: pygame.Surface = text.font.render(write[:i], False, text.color)
-            self.window_surface.blit(img, (rect.left, y))
-            y += font_height + line_spacing
-            write = write[i:]
+                if i < len(line):
+                    i = line.rfind(" ", 0, i) + 1
+
+                img: pygame.Surface = text.font.render(line[:i], False, text.color[:3])
+                img.set_alpha(text.color[3])
+                self.window_surface.blit(img, (rect.left, y))
+                y += font_height + line_spacing
+                line = line[i:]
 
     def update(self, dt: float):
         if self.is_in_dialogue():
@@ -110,8 +135,8 @@ class UIManager:
     def render(self):
         if self.dialogue is not None:
             surface: pygame.Surface = self.window_surface.subsurface(pygame.Rect(
-                0, self.window_dimensions.y - self.window_dimensions.y // 3,
-                self.window_dimensions.x, self.window_dimensions.y // 3)
+                self.window_dimensions.x * 1 / 12, self.window_dimensions.y - self.window_dimensions.y // 3,
+                self.window_dimensions.x * 10 / 12, self.window_dimensions.y // 3)
             )
             self.dialogue.render(surface, self)
 

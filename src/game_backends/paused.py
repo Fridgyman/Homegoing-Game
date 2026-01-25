@@ -18,17 +18,17 @@ class PausedBackend(Backend):
         self.bottom_pos = game.window_surface.get_rect().midbottom
         self.top_pos = game.window_surface.get_rect().midtop
 
-        game.ui_manager.add_button(Button(Text("Continue", pygame.Vector3(255, 255, 255),
+        game.ui_manager.add_button(Button(Text("Continue", [255, 255, 255, 255],
             self.center_pos + pygame.Vector2(0, -70), True, game.asset_manager.get_font("snake64")
-        ), pygame.Vector2(-40, 0), game.asset_manager.get_font("snake40"), pygame.Vector3(150, 0, 150)))
+        ), pygame.Vector2(-40, 0), game.asset_manager.get_font("snake40"), [150, 0, 150, 255]))
 
-        game.ui_manager.add_button(Button(Text("Exit to Main Menu", pygame.Vector3(255, 255, 255),
+        game.ui_manager.add_button(Button(Text("Exit to Main Menu", [255, 255, 255, 255],
             self.center_pos, True, game.asset_manager.get_font("snake64")
-        ), pygame.Vector2(-40, 0), game.asset_manager.get_font("snake40"), pygame.Vector3(150, 0, 150)))
+        ), pygame.Vector2(-40, 0), game.asset_manager.get_font("snake40"), [150, 0, 150, 255]))
 
-        game.ui_manager.add_button(Button(Text("Exit to Desktop", pygame.Vector3(255, 255, 255),
+        game.ui_manager.add_button(Button(Text("Exit to Desktop", [255, 255, 255, 255],
             self.center_pos + pygame.Vector2(0, 70), True, game.asset_manager.get_font("snake64")
-        ), pygame.Vector2(-40, 0), game.asset_manager.get_font("snake40"), pygame.Vector3(150, 0, 150)))
+        ), pygame.Vector2(-40, 0), game.asset_manager.get_font("snake40"), [150, 0, 150, 255]))
 
     def unload(self, game):
         game.ui_manager.remove_text()

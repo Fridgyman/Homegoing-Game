@@ -20,6 +20,7 @@ class PlayingBackend(Backend):
         pass
 
     def input(self, game):
+        if self.fading != 0 and self.fade != 0 and self.fade != 255: return
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game.running = False

@@ -12,19 +12,19 @@
     }
   ],
   "static_entities": [
-    { "lookup_name": "porcupine", "grid_x": 4, "grid_y": 4 }
+    { "lookup_name": "porcupine", "grid_x": 6, "grid_y": 6 }
   ],
   "interactable_entities": [
     {
       "lookup_name": "porcupine",
-      "grid_x": 16,
-      "grid_y": 16,
+      "grid_x": 3,
+      "grid_y": 3,
       "dialogue": {
         "start_monologue": 0,
         "monologues": [
           {
             "speaker": "strangely familiar stranger",
-            "lines": [ "do i know you?", "you look familiar" ],
+            "lines": [ "do i know you?\n", "you look familiar" ],
             "char_speeds": [ 0.05, 0.05 ],
             "font": "snake64",
             "options": [],
