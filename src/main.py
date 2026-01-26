@@ -3,6 +3,7 @@ import argparse
 
 from src.game import Game
 from src.game_backends.backend import GameState
+
 def main():
     pygame.init()
 
