@@ -41,7 +41,7 @@ class Config:
 
         self.dialogue_box_dims = pygame.Vector2(round(self.dialogue_box_dims_fractions.x * self.window_dims.x),
                                                 round(self.dialogue_box_dims_fractions.y * self.window_dims.y))
-        self.dialogue_box_dims = pygame.Vector2(round(self.dialogue_box_pos_fractions.x * self.window_dims.x),
+        self.dialogue_box_pos = pygame.Vector2(round(self.dialogue_box_pos_fractions.x * self.window_dims.x),
                                                 round(self.dialogue_box_pos_fractions.y * self.window_dims.y))
 
 config: Config | None = None

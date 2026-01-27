@@ -1,5 +1,6 @@
 import pygame
 
+from src.fade import Fade
 from src.ui_manager import UIManager, Text, Button
 
 import src.config as cfg

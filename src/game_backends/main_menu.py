@@ -7,6 +7,7 @@ from src.ui_manager import Text, Button
 class Menu(enum.Enum):
     MAIN = 0
     HOW_TO_PLAY = 1
+    CREDITS = 2
 
 class MainMenuBackend(Backend):
     def __init__(self):
@@ -40,53 +41,138 @@ class MainMenuBackend(Backend):
         match new_menu:
             case Menu.MAIN:
                 game.ui_manager.add_text(Text("Homegoing", [170, 20, 20, 255],
-                    self.center_pos + pygame.Vector2(0, -170), True, game.asset_manager.get_font("snake192")))
-
-                game.ui_manager.add_text(Text("Made by: Theodor, Yazan, Mihir, Abode, Jonas", [255, 255, 255, 255],
-                    self.bottom_pos + pygame.Vector2(0, -80), True, game.asset_manager.get_font("snake40")))
+                    self.center_pos + pygame.Vector2(0, -230), True, game.asset_manager.get_font("snake192")))
 
                 play_text: str = "Continue" if game.state_backends[GameState.PLAYING].is_setup else "Play"
                 game.ui_manager.add_button(Button(Text(play_text, [255, 255, 255, 255],
-                    self.center_pos + pygame.Vector2(0, 30), True, game.asset_manager.get_font("snake64")
+                    self.center_pos + pygame.Vector2(0, -20), True, game.asset_manager.get_font("snake64")
                 ), pygame.Vector2(-40, 0), game.asset_manager.get_font("snake40"), [150, 0, 150, 255]))
 
                 game.ui_manager.add_button(Button(Text("How to play", [255, 255, 255, 255],
-                    self.center_pos + pygame.Vector2(0, 110), True, game.asset_manager.get_font("snake64")
+                    self.center_pos + pygame.Vector2(0, 60), True, game.asset_manager.get_font("snake64")
+                ), pygame.Vector2(-40, 0), game.asset_manager.get_font("snake40"), [150, 0, 150, 255]))
+
+                game.ui_manager.add_button(Button(Text("Credits", [255, 255, 255, 255],
+                    self.center_pos + pygame.Vector2(0, 140), True, game.asset_manager.get_font("snake64")
                 ), pygame.Vector2(-40, 0), game.asset_manager.get_font("snake40"), [150, 0, 150, 255]))
 
                 game.ui_manager.add_button(Button(Text("Exit", [255, 255, 255, 255],
-                    self.center_pos + pygame.Vector2(0, 190), True, game.asset_manager.get_font("snake64")
+                    self.center_pos + pygame.Vector2(0, 220), True, game.asset_manager.get_font("snake64")
                 ), pygame.Vector2(-40, 0), game.asset_manager.get_font("snake40"), [150, 0, 150, 255]))
 
             case Menu.HOW_TO_PLAY:
                 game.ui_manager.add_text(
                     Text("How to play",
                          [170, 20, 20, 255],
-                         self.top_pos + pygame.Vector2(0, 380), True,
+                         self.center_pos + pygame.Vector2(0, -200), True,
                          game.asset_manager.get_font("snake64"))
                 )
                 game.ui_manager.add_text(
                     Text("Walk around and talk with W/A/S/D or the arrow keys",
                          [255, 255, 255, 255],
-                         self.top_pos + pygame.Vector2(0, 480), True,
+                         self.center_pos + pygame.Vector2(0, -60), True,
                          game.asset_manager.get_font("snake46"))
                 )
                 game.ui_manager.add_text(
                     Text("Interact with the environment with ENTER or SPACE",
                          [255, 255, 255, 255],
-                         self.top_pos + pygame.Vector2(0, 540), True,
+                         self.center_pos + pygame.Vector2(0, 0), True,
                          game.asset_manager.get_font("snake46"))
                 )
                 game.ui_manager.add_text(
                     Text("Talk to characters and complete objectives",
                          [255, 255, 255, 255],
-                         self.top_pos + pygame.Vector2(0, 600), True,
+                         self.center_pos + pygame.Vector2(0, 60), True,
                          game.asset_manager.get_font("snake46"))
                 )
 
                 game.ui_manager.add_button(Button(
-                    Text("Understood, take me back", [255, 255, 255, 255],
-                         self.top_pos + pygame.Vector2(0, 750), True,
+                    Text("Understood", [255, 255, 255, 255],
+                         self.center_pos + pygame.Vector2(0, 180), True,
+                         game.asset_manager.get_font("snake64")
+                    ), pygame.Vector2(-40, 0), game.asset_manager.get_font("snake40"), [150, 0, 150, 255]))
+
+            case Menu.CREDITS:
+                game.ui_manager.add_text(
+                    Text("Credits",
+                         [170, 20, 20, 255],
+                         self.center_pos + pygame.Vector2(0, -300), True,
+                         game.asset_manager.get_font("snake64"))
+                ) 
+
+                game.ui_manager.add_text(
+                    Text("Mihir",
+                         [255, 255, 255, 255],
+                         self.center_pos + pygame.Vector2(-200, -160), False,
+                         game.asset_manager.get_font("snake46"))
+                )
+
+                game.ui_manager.add_text(
+                    Text("Programmer",
+                         [255, 255, 255, 255],
+                         self.center_pos + pygame.Vector2(200, -160), False,
+                         game.asset_manager.get_font("snake46"))
+                )
+
+                game.ui_manager.add_text(
+                    Text("Theodor",
+                         [255, 255, 255, 255],
+                         self.center_pos + pygame.Vector2(-200, -100), False,
+                         game.asset_manager.get_font("snake46"))
+                )
+
+                game.ui_manager.add_text(
+                    Text("Programmer",
+                         [255, 255, 255, 255],
+                         self.center_pos + pygame.Vector2(200, -100), False,
+                         game.asset_manager.get_font("snake46"))
+                )
+
+                game.ui_manager.add_text(
+                    Text("Abdulrahman",
+                         [255, 255, 255, 255],
+                         self.center_pos + pygame.Vector2(-200, -40), False,
+                         game.asset_manager.get_font("snake46"))
+                )
+
+                game.ui_manager.add_text(
+                    Text("Artist",
+                         [255, 255, 255, 255],
+                         self.center_pos + pygame.Vector2(200, -40), False,
+                         game.asset_manager.get_font("snake46"))
+                )
+
+                game.ui_manager.add_text(
+                    Text("Yazan",
+                         [255, 255, 255, 255],
+                         self.center_pos + pygame.Vector2(-200, 20), False,
+                         game.asset_manager.get_font("snake46"))
+                )
+
+                game.ui_manager.add_text(
+                    Text("Artist",
+                         [255, 255, 255, 255],
+                         self.center_pos + pygame.Vector2(200, 20), False,
+                         game.asset_manager.get_font("snake46"))
+                )
+
+                game.ui_manager.add_text(
+                    Text("Jonas",
+                         [255, 255, 255, 255],
+                         self.center_pos + pygame.Vector2(-200, 80), False,
+                         game.asset_manager.get_font("snake46"))
+                )
+
+                game.ui_manager.add_text(
+                    Text("Writer",
+                         [255, 255, 255, 255],
+                         self.center_pos + pygame.Vector2(200, 80), False,
+                         game.asset_manager.get_font("snake46"))
+                )
+
+                game.ui_manager.add_button(Button(
+                    Text("Back", [255, 255, 255, 255],
+                         self.center_pos + pygame.Vector2(0, 200), True,
                          game.asset_manager.get_font("snake64")
                     ), pygame.Vector2(-40, 0), game.asset_manager.get_font("snake40"), [150, 0, 150, 255]))
 
@@ -105,11 +191,15 @@ class MainMenuBackend(Backend):
                                     self.next_backend = GameState.PLAYING
                                 case 1: # HOW TO PLAY
                                     self.switch_menu(game, Menu.HOW_TO_PLAY)
-                                case 2: # EXIT
+                                case 2: # CREDITS
+                                    self.switch_menu(game, Menu.CREDITS)
+                                case 3: # EXIT
                                     self.fading = -500
                                     self.next_backend = GameState.QUITTING
                                     return
                         case Menu.HOW_TO_PLAY:
+                            self.switch_menu(game, Menu.MAIN)
+                        case Menu.CREDITS:
                             self.switch_menu(game, Menu.MAIN)
 
         keys: pygame.key.ScancodeWrapper = pygame.key.get_pressed()
