@@ -16,6 +16,8 @@ class PlayingBackend(Backend):
         self.fade = 0
         self.fading = 500
 
+        game.camera.shake_camera(intensity_x=4, intensity_y=4, duration=20)
+       
     def unload(self, game):
         pass
 
