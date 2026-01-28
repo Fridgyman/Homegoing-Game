@@ -8,7 +8,7 @@ def dir_to_str(direction: pygame.Vector2) -> str:
         case (-1, 0): return "left"
 
 class Sprite:
-    def __init__(self, frames: pygame.Surface, dimensions: pygame.Vector2,
+    def __init__(self, spritesheet: pygame.Surface, dimensions: pygame.Vector2,
                  animations: list[str], row_major: bool,
                  num_frames: int, direction: bool, frame_time: float = 0.2):
 
@@ -21,15 +21,18 @@ class Sprite:
         self.frame_time: float = frame_time
         self.frame_index: int = 0
 
-        elements: int = num_frames
-        if direction: elements *= 4
+        self.init_frames(spritesheet, animations, row_major)
+
+    def init_frames(self, spritesheet: pygame.Surface, animations: list[str], row_major: bool) -> None:
+        elements: int = self.num_frames
+        if self.compound: elements *= 4
 
         x: int = 0
         y: int = 0
         for i in range(elements):
-            subsurface: pygame.Surface = frames.subsurface(pygame.Rect(
-                x * dimensions.x, y * dimensions.y,
-                dimensions.x, dimensions.y)
+            subsurface: pygame.Surface = spritesheet.subsurface(pygame.Rect(
+                x * self.dimensions.x, y * self.dimensions.y,
+                self.dimensions.x, self.dimensions.y)
             )
 
             animation: str = animations[y if row_major else x]
@@ -43,7 +46,7 @@ class Sprite:
             else:
                 y += 1
 
-            if i % num_frames == num_frames - 1:
+            if i % self.num_frames == self.num_frames - 1:
                 if row_major:
                     x = 0
                     y += 1

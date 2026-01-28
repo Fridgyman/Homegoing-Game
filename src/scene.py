@@ -36,13 +36,13 @@ class Scene:
                 entity.interact(self.player, ui_manager)
 
     def update(self, camera: Camera, ui_manager: UIManager, dt: float) -> None:
-        camera.center(self.player.pos, self.bounds)
+        camera.center_at(self.player.pos, self.bounds)
 
         self.player.update(self.entities, ui_manager, dt)
-        self.player.grid_pos.x = max(0, min(self.player.grid_pos.x, self.bounds.x))
-        self.player.grid_pos.y = max(0, min(self.player.grid_pos.y, self.bounds.y))
-        self.player.pos.x = max(0, min(self.player.pos.x, self.bounds.x - self.player.sprite.dimensions.x))
-        self.player.pos.y = max(0, min(self.player.pos.y, self.bounds.y - self.player.sprite.dimensions.y))
+        self.player.grid_pos.x = pygame.math.clamp(self.player.grid_pos.x, 0, self.bounds.x)
+        self.player.grid_pos.y = pygame.math.clamp(self.player.grid_pos.y, 0, self.bounds.y)
+        self.player.pos.x = pygame.math.clamp(self.player.pos.x, 0, self.bounds.x - self.player.sprite.dimensions.x)
+        self.player.pos.y = pygame.math.clamp(self.player.pos.y, 0, self.bounds.y - self.player.sprite.dimensions.y)
 
         ui_manager.update(dt)
 

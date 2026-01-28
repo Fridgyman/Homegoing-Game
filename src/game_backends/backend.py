@@ -13,7 +13,7 @@ class Backend:
     def __init__(self):
         self.fade: int = 0
         self.fading: int = 0
-        self.overlay: pygame.Surface = pygame.Surface(pygame.display.get_window_size(), pygame.SRCALPHA)
+        self.overlay: pygame.Surface = pygame.Surface(pygame.display.get_window_size()).convert()
 
         self.next_backend: Backend | None = None
 

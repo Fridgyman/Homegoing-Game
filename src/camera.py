@@ -12,7 +12,7 @@ class Camera:
 
         self.window_center = cfg.config.window_dims // 2
 
-    def center(self, pos: pygame.Vector2, bounds: pygame.Vector2) -> None:
+    def center_at(self, pos: pygame.Vector2, bounds: pygame.Vector2) -> None:
         self.pos = pos - self.window_center
         self.clamp_pos(bounds)
 

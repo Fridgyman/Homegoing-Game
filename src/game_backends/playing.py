@@ -13,8 +13,10 @@ class PlayingBackend(Backend):
             game.scene_manager.load_scene("test")
 
         self.next_backend = None
-        self.fade = 0
+        self.fade = 255
         self.fading = 500
+
+        self.overlay.fill((0, 0, 0))
 
     def unload(self, game) -> None:
         pass
@@ -40,8 +42,8 @@ class PlayingBackend(Backend):
 
     def update(self, game) -> None:
         game.scene_manager.update(game.camera, game.ui_manager, game.delta_time)
-        self.fade = max(0, min(255, int(self.fade + self.fading * game.delta_time)))
-        if self.next_backend and (self.fade == 0 or self.fading == 0):
+        self.fade = max(0, min(255, int(self.fade - self.fading * game.delta_time)))
+        if self.next_backend and (self.fade == 255 or self.fading == 0):
             if self.next_backend == GameState.QUITTING:
                 game.running = False
                 return
@@ -50,6 +52,6 @@ class PlayingBackend(Backend):
     def render(self, game) -> None:
         game.scene_manager.render(game.window_surface, game.camera)
         game.ui_manager.render()
-        self.overlay.fill((0, 0, 0, 255 - self.fade))
+        self.overlay.set_alpha(self.fade)
         game.window_surface.blit(self.overlay, (0, 0))
         pygame.display.flip()
