@@ -6,6 +6,7 @@ def dir_to_str(direction: pygame.Vector2) -> str:
         case (1, 0): return "right"
         case (0, -1): return "up"
         case (-1, 0): return "left"
+        case _: return "down"
 
 class Sprite:
     def __init__(self, spritesheet: pygame.Surface, dimensions: pygame.Vector2,

@@ -25,7 +25,7 @@ def main():
     # scalene_profiler.start()
 
     game: Game = Game("assets/asset_guide.json", "scenes/scene_guide.json", "config.json", game_state=state)
-    game.run(10000, 50)
+    game.run(60, 50)
 
     # scalene_profiler.stop()
 

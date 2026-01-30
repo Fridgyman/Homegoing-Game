@@ -54,7 +54,8 @@ class Scene:
 
         ui_manager.update()
 
-        for entity in self.entities: entity.update(ui_manager, dt)
+        for entity in self.entities:
+            entity.update(ui_manager, dt)
 
     def render(self, window_surface: pygame.Surface, camera: Camera, ui_manager: UIManager) -> None:
         window_surface.fill((0, 0, 0))

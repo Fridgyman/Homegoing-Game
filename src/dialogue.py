@@ -44,8 +44,8 @@ class Monologue:
             raise ValueError("Monologue requires at least one line")
 
         self.spoken: str = ""
-        self.line_index: list[int, int] = [0, len(self.lines)] # [ current, final ]
-        self.char_index: list[int, int] = [0, len(self.lines[0])] # [ current, final ]
+        self.line_index: list[int] = [0, len(self.lines)] # [ current, final ]
+        self.char_index: list[int] = [0, len(self.lines[0])] # [ current, final ]
 
         if len(char_speeds) != len(lines):
             raise ValueError("char_speeds must have the same length as lines")
@@ -73,6 +73,7 @@ class Monologue:
 
     def add_option_monologue(self, option_title: str, monologue) -> None:
         self.options.append((option_title, monologue))
+        self.has_options = len(self.options) > 0
         self.is_final = (not self.has_options) and self.next_monologue is None
 
     def choose(self, choice: int):
@@ -223,14 +224,10 @@ class Dialogue:
 
     def choose_option(self) -> None:
         self.current_monologue = self.current_monologue.choose(self.choice_index)
-        self.current_monologue.fade = 0
-        self.current_monologue.fading = 0
         self.current_monologue.is_reset = False
 
     def load_monologue(self, monologue: Monologue) -> None:
         self.current_monologue = monologue
-        self.current_monologue.fade = 0
-        self.current_monologue.fading = 0
         self.current_monologue.is_reset = False
 
     def input(self, keys: pygame.key.ScancodeWrapper) -> None:
