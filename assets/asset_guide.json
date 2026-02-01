@@ -2,7 +2,7 @@
   "audio": [
     {
       "name": "effia_theme",
-      "path": "assets/audio/effia_theme.mp3"
+      "path": "assets/audio/effia_theme.flac"
     }
   ],
 
@@ -37,10 +37,11 @@
       "width": 32,
       "height": 32,
       "num_frames": 4,
-      "direction": true,
-      "animations": ["right", "down", "up", "left"],
-      "animation_layout": "columns",
-      "frame_time": 0.1
+      "animations": [
+        "move_right", "move_down", "move_up", "move_left",
+        "idle_right", "idle_down", "idle_up", "idle_left"
+      ],
+      "animation_layout": "columns"
     }
   ]
 }

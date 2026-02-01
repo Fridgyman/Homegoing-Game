@@ -1,12 +1,12 @@
 import pygame
 
+from src.asset_manager import AssetManager
 from src.camera import Camera
-from src.ui_manager import UIManager
+from src.config import Config
 from src.sprite import Sprite
 from src.sprite import dir_to_str
-from src.asset_manager import AssetManager
+from src.ui_manager import UIManager
 
-from src.config import Config
 
 class Entity:
     def __init__(self, grid_pos: pygame.Vector2, sprite: Sprite, collision: bool):
@@ -15,7 +15,7 @@ class Entity:
         self.velocity: pygame.Vector2 = pygame.Vector2(0, 0)
 
         self.sprite: Sprite = sprite
-        self.hit_box: pygame.Vector2 = self.sprite.dimensions / 32 # MAKE DYNAMIC (LARGE CHARACTERS ARENT COLLIDED WITH)
+        self.hit_box: pygame.Vector2 = self.sprite.dimensions / Config.TILE_SIZE
 
         self.collision: bool = collision
 
@@ -23,10 +23,8 @@ class Entity:
         self.sprite = sprite
         self.hit_box = hit_box
 
-    def get_collision(self, pos: pygame.Vector2) -> bool:
-        return self.collision and \
-               self.grid_pos.x <= pos.x < self.grid_pos.x + self.hit_box.x and \
-               self.grid_pos.y <= pos.y < self.grid_pos.y + self.hit_box.y
+    def get_collision(self, rect: pygame.Rect) -> bool:
+        return self.collision and rect.colliderect(pygame.Rect(self.grid_pos, self.hit_box))
 
     def look_at(self, grid_pos: pygame.Vector2) -> None:
         diff: pygame.Vector2 = self.grid_pos - grid_pos
@@ -42,10 +40,10 @@ class Entity:
         pass
 
     def update(self, ui_manager: UIManager, dt: float) -> None:
+        self.sprite.set(dir_to_str(self.velocity, self.facing))
         self.sprite.update(dt)
 
     def render(self, surface: pygame.Surface, camera: Camera) -> None:
         centered: pygame.Vector2 = self.grid_pos * Config.TILE_SIZE - self.sprite.dimensions / 2
         centered.x -= self.sprite.dimensions.y - Config.TILE_SIZE
-        surface.blit(self.sprite.get(dir_to_str(self.facing)) or AssetManager.NULL_IMAGE,
-                     camera.world_pos_to_view_pos(centered))
+        surface.blit(self.sprite.get() or AssetManager.NULL_IMAGE, camera.world_pos_to_view_pos(centered))

@@ -1,0 +1,147 @@
+{
+    "void_color": { "r": 0, "g": 170, "b": 0, "a": 15 },
+    "bounds": { "x": 100, "y": 100 },
+    "background_music": {
+        "identifier": "effia_theme",
+        "volume": 0
+    },
+
+    "map_elements": [
+		{
+			"rect": {
+				"x": 20,
+				"y": 5,
+				"w": 1,
+				"h": 3
+			},
+			"image": "null",
+			"collision": false
+		}
+	],
+
+    "entity_lookup": [
+		{
+			"id": "porcupine",
+			"sprite": "player",
+			"default_animation": "move_down",
+			"animation_frame_time": 0.05,
+			"collision": true
+		}
+	],
+
+    "player": {
+		"lookup": "porcupine",
+		"fallback_spawn": { "x": 0, "y": 0 },
+        "move_duration": 0.15
+	},
+
+    "static_entities": [
+        {
+            "lookup_name": "porcupine",
+            "grid_x": 6,
+            "grid_y": 6
+        }
+    ],
+
+    "interactable_entities": [
+        {
+            "lookup_name": "porcupine",
+            "grid_x": 3,
+            "grid_y": 3,
+            "dialogue": {
+                "start_monologue": 0,
+                "monologues": [
+                    {
+                        "speaker": "strangely familiar stranger",
+                        "lines": [ "do i know you?\n", "you look familiar" ],
+                        "char_speeds": [ 0.05, 0.05 ],
+                        "font": "snake64",
+                        "options": [],
+                        "speaker_image": null,
+                        "next_monologue": 1
+                    },
+                    {
+                        "speaker": "you",
+                        "lines": [ "what?" ],
+                        "char_speeds": [ 0.25 ],
+                        "font": "snake64",
+                        "options": [],
+                        "speaker_image": "null",
+                        "next_monologue": 2
+                    },
+                    {
+                        "speaker": "strangely familiar stranger",
+                        "lines": [ "okay bye now" ],
+                        "char_speeds": [ 0.05 ],
+                        "font": "snake64",
+                        "options": [
+                            { "text": "okay bye", "leads_to": 3 },
+                            { "text": "damn ok", "leads_to": 4 }
+                        ],
+                        "speaker_image": null,
+                        "next_monologue": null
+                    },
+                    {
+                        "speaker": "you",
+                        "lines": [ "okay bye" ],
+                        "char_speeds": [ 0.05 ],
+                        "font": "snake64",
+                        "options": [],
+                        "speaker_image": "null",
+                        "next_monologue": null
+                    },
+                    {
+                        "speaker": "you",
+                        "lines": [ "damn ok" ],
+                        "char_speeds": [ 0.05 ],
+                        "font": "snake64",
+                        "options": [],
+                        "speaker_image": "null",
+                        "next_monologue": null
+                    }
+                ]
+            }
+        }
+    ],
+
+    "entrances": [
+		{
+            "identifier": "second",
+			"rect": {
+				"x": 1,
+				"y": 5,
+				"w": 1,
+				"h": 3
+			},
+            "spawn": { "x": 1, "y": 6 },
+			"transition": "fade",
+            "transition_time": 1,
+			"conditions": {
+				"all": [],
+				"any": [],
+				"not": []
+			}
+		}
+	],
+
+	"exits": [
+		{
+			"rect": {
+				"x": 20,
+				"y": 5,
+				"w": 1,
+				"h": 3
+			},
+			"require_interact": true,
+			"transition": "fade",
+            "transition_time": 1,
+			"next_scene": "test",
+            "entrance": "first",
+			"conditions": {
+				"all": [],
+				"any": [],
+				"not": []
+			}
+		}
+	]
+}

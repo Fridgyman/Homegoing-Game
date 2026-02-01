@@ -23,7 +23,7 @@
 		{
 			"id": "--identifier--",
 			"sprite": "--asset guide sprite--",
-			"start_animation": "--animation name--",
+			"default_animation": "--animation name--",
 			"animation_frame_time": null,
 			"collision": false
 		}
@@ -31,22 +31,11 @@
 
 	"player": {
 		"lookup": "--entity lookup identifier--",
-		"fallback_spawn": { "x": null, "y": null }
+		"fallback_spawn": { "x": null, "y": null },
+		"move_duration": null
 	},
 
-	"static_entities": [
-		{
-			"lookup": "--entity lookup identifier--",
-			"spawn": { "x": null, "y": null },
-			"conditions": {
-				"all": ["--flags--"],
-				"any": ["--flags--"],
-				"not": ["--flags--"]
-			}
-		}
-	],
-
-	"interactable_entities": [
+	"entities": [
 		{
 			"lookup": "--entity lookup identifier--",
 			"spawn": { "x": null, "y": null },
@@ -222,18 +211,16 @@
 
 	"entrances": [
 		{
+			"identifier": "--identifier--",
 			"rect": {
 				"x": null,
 				"y": null,
 				"w": null,
 				"h": null
 			},
+			"spawn": { "x": null, "y": null },
 			"transition": "--void walk/fade/no transition--",
-			"conditions": {
-				"all": ["--flags--"],
-				"any": ["--flags--"],
-				"not": ["--flags--"]
-			}
+			"transition_time": null
 		}
 	],
 
@@ -245,8 +232,11 @@
 				"w": null,
 				"h": null
 			},
+			"require_interact": false,
 			"transition": "--void walk/fade/no transition--",
+			"transition_time": null,
 			"next_scene": "--scene identifier--",
+			"entrance": "--next scene entrance identifier--",
 			"conditions": {
 				"all": ["--flags--"],
 				"any": ["--flags--"],

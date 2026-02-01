@@ -1,4 +1,5 @@
 import json
+
 import pygame
 
 from src.sprite import Sprite
@@ -16,29 +17,39 @@ class AssetManager:
         with open(asset_guide, "r") as file:
             obj = json.load(file)
 
-        for audio in obj["audio"]:
-            self.add_audio(name=audio["name"], audio_path=audio["path"])
+        for audio in obj.get("audio", []):
+            self.add_audio(
+                name=audio.get("name"),
+                audio_path=audio.get("path")
+            )
 
-        for font in obj["fonts"]:
-            for size in font["sizes"]:
-                self.add_font(name=font["name"], font_path=font["path"], font_size=size)
+        for font in obj.get("fonts", []):
+            for size in font.get("sizes", []):
+                self.add_font(
+                    name=font.get("name"),
+                    font_path=font.get("path"),
+                    font_size=size
+                )
 
-        for image in obj["images"]:
-            self.add_image(name=image["name"], image_path=image["path"])
+        for image in obj.get("images", []):
+            self.add_image(
+                name=image.get("name"),
+                image_path=image.get("path")
+            )
 
-        for sprite in obj["sprites"]:
-            self.add_sprite(name=sprite["name"],
-                            sprite_sheet=sprite["sprite_sheet"],
-                            dimensions=pygame.Vector2(sprite["width"], sprite["height"]),
-                            animations=sprite["animations"],
-                            animation_layout=sprite["animation_layout"],
-                            num_frames=sprite["num_frames"],
-                            direction=sprite["direction"],
-                            frame_time=sprite["frame_time"])
+        for sprite in obj.get("sprites", []):
+            self.add_sprite(
+                name=sprite.get("name"),
+                sprite_sheet=sprite.get("sprite_sheet"),
+                dimensions=pygame.Vector2(sprite.get("width"), sprite.get("height")),
+                animations=sprite.get("animations"),
+                animation_layout=sprite.get("animation_layout"),
+                num_frames=sprite.get("num_frames")
+            )
 
     @classmethod
     def add_audio(cls, name: str, audio_path: str) -> None:
-        cls.AUDIO_ASSETS[name] = pygame.mixer.Sound(file=audio_path)
+        cls.AUDIO_ASSETS[name] = pygame.mixer.Sound(audio_path)
 
     @classmethod
     def add_font(cls, name: str, font_path: str, font_size: int) -> None:
@@ -51,11 +62,13 @@ class AssetManager:
     @classmethod
     def add_sprite(cls, name: str, sprite_sheet: str, dimensions: pygame.Vector2,
                    animations: list[str], animation_layout: str,
-                   num_frames: int, direction: bool, frame_time: float) -> None:
+                   num_frames: int) -> None:
         cls.SPRITES[name] = Sprite(
-            cls.IMAGE_ASSETS[sprite_sheet], dimensions,
-            animations, animation_layout == "rows",
-            num_frames, direction, frame_time
+            spritesheet=AssetManager.get_image(sprite_sheet),
+            dimensions=dimensions,
+            animations=animations,
+            row_major=animation_layout == "rows",
+            num_frames=num_frames
         )
 
     @classmethod

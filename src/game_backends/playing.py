@@ -2,6 +2,7 @@ import pygame
 
 from src.game_backends.backend import Backend, GameState
 
+
 class PlayingBackend(Backend):
     def __init__(self):
         super().__init__()
@@ -10,9 +11,9 @@ class PlayingBackend(Backend):
     def init(self, game) -> None:
         if not self.is_setup:
             self.is_setup = True
-            game.scene_manager.load_scene("test")
+            game.scene_manager.current_scene = "test"
 
-        game.scene_manager.scenes[game.scene_manager.current_scene].load()
+        game.scene_manager.scenes[game.scene_manager.current_scene].load("first", pygame.Vector2(0, -1))
 
         self.next_backend = None
         self.fade = 255
