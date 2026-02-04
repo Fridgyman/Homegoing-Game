@@ -37,6 +37,7 @@
 
 	"entities": [
 		{
+			"id": "--identifier--",
 			"lookup": "--entity lookup identifier--",
 			"spawn": { "x": null, "y": null },
 			"conditions": {
@@ -68,33 +69,14 @@
 						"not": ["--flags--"]
 					},
 
-					"modify_flags_on_start": {
-						"all": [
-							{ "how": "--remove/add/toggle--", "value": "--flag--" }
-						],
-						"any": [
-							{ "how": "--remove/add/toggle--", "value": "--flag--" }
-						],
-						"not": [
-							{ "how": "--remove/add/toggle--", "value": "--flag--" }
-						]
-					},
+					"modify_flags_on_start": [
+						{ "how": "--remove/add/toggle--", "value": "--flag--" }
+					],
 
 					"dispatch_on_start": [
 						{
 							"name": "--event identifier--",
 							"--additional arguments--": null
-						}
-					],
-
-					"set_route_on_start": [
-						{
-							"id": "--route identifier--",
-							"conditions": {
-								"all": ["--flags--"],
-								"any": ["--flags--"],
-								"not": ["--flags--"]
-							}
 						}
 					],
 
@@ -142,6 +124,13 @@
 								}
 							],
 
+							"dispatch_on_reach": [
+								{
+									"name": "--event identifier--",
+									"--additional arguments--": null
+								}
+							],
+
 							"options": [
 								{
 									"text": "--option text--",
@@ -159,27 +148,8 @@
 										}
 									],
 
-									"modify_flags_on_select": {
-										"all": [
-											{ "how": "--remove/add/toggle--", "value": "--flag--" }
-										],
-										"any": [
-											{ "how": "--remove/add/toggle--", "value": "--flag--" }
-										],
-										"not": [
-											{ "how": "--remove/add/toggle--", "value": "--flag--" }
-										]
-									},
-
-									"set_route_on_select": [
-										{
-											"id": "--route identifier--",
-											"conditions": {
-												"all": ["--flags--"],
-												"any": ["--flags--"],
-												"not": ["--flags--"]
-											}
-										}
+									"modify_flags_on_select": [
+										{ "how": "--remove/add/toggle--", "value": "--flag--" }
 									]
 								}
 							]
@@ -212,14 +182,8 @@
 	"entrances": [
 		{
 			"identifier": "--identifier--",
-			"rect": {
-				"x": null,
-				"y": null,
-				"w": null,
-				"h": null
-			},
 			"spawn": { "x": null, "y": null },
-			"transition": "--void walk/fade/no transition--",
+			"transition": "--fade/no transition--",
 			"transition_time": null
 		}
 	],
@@ -233,7 +197,7 @@
 				"h": null
 			},
 			"require_interact": false,
-			"transition": "--void walk/fade/no transition--",
+			"transition": "--fade/no transition--",
 			"transition_time": null,
 			"next_scene": "--scene identifier--",
 			"entrance": "--next scene entrance identifier--",

@@ -11,9 +11,9 @@ class PlayingBackend(Backend):
     def init(self, game) -> None:
         if not self.is_setup:
             self.is_setup = True
-            game.scene_manager.current_scene = "test"
 
-        game.scene_manager.scenes[game.scene_manager.current_scene].load("first", pygame.Vector2(0, -1))
+        game.scene_manager.current_scene = "test"
+        game.scene_manager.scenes[game.scene_manager.current_scene].load("", pygame.Vector2(0, 1))
 
         self.next_backend = None
         self.fade = 255

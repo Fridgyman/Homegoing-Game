@@ -1,7 +1,9 @@
 import pygame
 
-from src.ui_manager import UIManager, Text, Button
 from src.config import Config
+from src.event import DispatchEvent
+from src.route_tracker import Conditions
+from src.ui_manager import UIManager, Text, Button
 
 SPEAKER_IMAGE_MARGIN_LEFT = 15
 SPEAKER_IMAGE_MARGIN_TOP = 15
@@ -17,26 +19,50 @@ TRIANGLE_MARGIN_BOTTOM = 50
 
 FADE_SPEED = 1000
 
+class MonologueLine:
+    def __init__(self, text: str, speed: float):
+        self.text: str = text
+        self.speed: float = speed
+
+class MonologueOption:
+    def __init__(self, text: str, next_monologue: str, conditions: Conditions,
+                 dispatch: list[DispatchEvent], modify_flags: list[tuple[str, str]],
+                 set_route: list[tuple[str, Conditions]]):
+        self.text: str = text
+        self.next_monologue: str = next_monologue
+        self.conditions: Conditions = conditions
+        self.dispatch: list[DispatchEvent] = dispatch
+        self.modify_flags: list[tuple[str, str]] = modify_flags
+        self.set_route: list[tuple[str, Conditions]] = set_route
+
+
 class Monologue:
     def __init__(self,
-                 speaker: str, lines: list[str], char_speeds: list[float],
-                 font: pygame.font.Font,
-                 next_monologue=None,
-                 options: list[tuple] = None,
-                 speaker_image: pygame.Surface | None = None):
+                 conditions: Conditions, alt_monologue: str,
+                 speaker: str, lines: list[MonologueLine], font: pygame.font.Font,
+                 next_monologue: str | None, set_route: list[tuple[str, Conditions]],
+                 dispatch: list[DispatchEvent], options: list[MonologueOption],
+                 speaker_image: pygame.Surface | None = None, speaking_sfx: pygame.mixer.Sound | None = None):
+        self.conditions: Conditions = conditions
+        self.alt_monologue: str = alt_monologue
+
         self.speaker: str = speaker
-        self.lines: list[str] = lines
+        self.lines: list[MonologueLine] = lines
         self.font = font
+
+        self.next_monologue: str | None = next_monologue
+        self.set_route: list[tuple[str, Conditions]] = set_route
+        self.dispatch: list[DispatchEvent] = dispatch
+        self.options: list[MonologueOption] = options
+
+        self.speaking_sfx: pygame.mixer.Sound | None = speaking_sfx
         self.speaker_image: pygame.Surface | None = speaker_image
-        if self.speaker_image is not None and self.speaker_image.get_width() == Config.TILE_SIZE:
+        if self.speaker_image is not None:
             size: int = Config.DIALOGUE_BOX_DIMS.y - SPEAKER_IMAGE_MARGIN_TOP * 2
             self.speaker_image = pygame.transform.scale(self.speaker_image, pygame.Vector2(size, size))
 
         self.awaiting_choice: bool = False
-        self.options: list[tuple] = options or []
         self.has_options: bool = len(self.options) > 0
-        self.next_monologue: Monologue | None = next_monologue
-
         self.is_final: bool = (not self.has_options) and self.next_monologue is None
 
         if not lines:
@@ -44,18 +70,19 @@ class Monologue:
 
         self.spoken: str = ""
         self.line_index: list[int] = [0, len(self.lines)] # [ current, final ]
-        self.char_index: list[int] = [0, len(self.lines[0])] # [ current, final ]
-
-        if len(char_speeds) != len(lines):
-            raise ValueError("char_speeds must have the same length as lines")
-
+        self.char_index: list[int] = [0, len(self.lines[0].text)] # [ current, final ]
         self.char_duration: float = 0
-        self.char_speeds: list[float] = char_speeds
 
         self.choice_fade: int = 0
         self.choice_fading: int = 0
 
         self.is_reset = True
+
+    def get_set_route(self) -> str | None:
+        for (route, conditions) in self.set_route:
+            if conditions.satisfied():
+                return route
+        return None
 
     def line_finished(self) -> bool:
         return self.char_index[0] == self.char_index[1]
@@ -66,18 +93,18 @@ class Monologue:
     def last_rendered_line(self) -> bool:
         return self.line_index[0] == self.line_index[1] - 1
 
-    def set_next_monologue(self, monologue) -> None:
+    def set_next_monologue(self, monologue: str) -> None:
         self.next_monologue = monologue
         self.is_final = (not self.has_options) and self.next_monologue is None
 
-    def add_option_monologue(self, option_title: str, monologue) -> None:
-        self.options.append((option_title, monologue))
+    def add_option(self, option: MonologueOption) -> None:
+        self.options.append(option)
         self.has_options = len(self.options) > 0
         self.is_final = (not self.has_options) and self.next_monologue is None
 
-    def choose(self, choice: int):
+    def choose(self, choice: int) -> str | None:
         if not self.awaiting_choice: return None
-        return self.options[choice][1]
+        return self.options[choice].next_monologue
 
     def reset(self) -> None:
         if self.is_reset: return
@@ -86,19 +113,15 @@ class Monologue:
         self.spoken = ""
         self.line_index[0] = 0
         self.char_index[0] = 0
-        self.char_index[1] = len(self.lines[0])
+        self.char_index[1] = len(self.lines[0].text)
 
         self.choice_fade: int = 0
         self.choice_fading: int = 0
 
         self.is_reset = True
 
-        if self.next_monologue is not None: self.next_monologue.reset()
-        for opt in self.options:
-            opt[1].reset()
-
-    def advance(self):
-        if self.awaiting_choice: return
+    def advance(self) -> str | None:
+        if self.awaiting_choice: return None
 
         if self.line_finished():
             self.line_index[0] += 1
@@ -109,11 +132,11 @@ class Monologue:
                     return None
                 return self.next_monologue
 
-            self.char_index[1] = len(self.lines[self.line_index[0]])
-            return self
-        self.spoken += self.lines[self.line_index[0]][self.char_index[0]:]
+            self.char_index[1] = len(self.lines[self.line_index[0]].text)
+            return ""
+        self.spoken += self.lines[self.line_index[0]].text[self.char_index[0]:]
         self.char_index[0] = self.char_index[1]
-        return self
+        return ""
 
     def update_fade(self, dt: float) -> None:
         self.choice_fading = FADE_SPEED if self.awaiting_choice else -FADE_SPEED
@@ -124,10 +147,10 @@ class Monologue:
 
         self.char_duration += dt
 
-        if self.char_duration >= self.char_speeds[self.line_index[0]] and not self.line_finished():
+        if self.char_duration >= self.lines[self.line_index[0]].speed and not self.line_finished():
             self.char_duration = 0
+            self.spoken += self.lines[self.line_index[0]].text[self.char_index[0]]
             self.char_index[0] += 1
-            self.spoken += self.lines[self.line_index[0]][self.char_index[0] - 1]
 
         self.awaiting_choice = len(self.options) > 0 and self.line_finished() and self.last_rendered_line()
 
@@ -157,7 +180,7 @@ class Monologue:
 
         for opt_i in range(len(self.options)):
             text: Text = Text(
-                self.options[opt_i][0], [255, 255, 255, self.choice_fade],
+                self.options[opt_i].text, [255, 255, 255, self.choice_fade],
                 start, self.font,
                 align_left=True
             )
@@ -187,9 +210,18 @@ class Monologue:
 
 
 class Dialogue:
-    def __init__(self, start_monologue: Monologue):
-        self.start_monologue: Monologue = start_monologue
-        self.current_monologue: Monologue = start_monologue
+    def __init__(self, conditions: Conditions, modify_flags: list[tuple[str, str]],
+                 dispatch: list[DispatchEvent], start_monologues: list[tuple[str, Conditions]],
+                 monologues: dict[str, Monologue], entity_id: str):
+        self.conditions: Conditions = conditions
+        self.modify_flags: list[tuple[str, str]] = modify_flags
+        self.dispatch: list[DispatchEvent] = dispatch
+        self.start_monologues: list[tuple[str, Conditions]] = start_monologues
+        self.monologues: dict[str, Monologue] = monologues
+
+        self.entity_id: str = entity_id
+
+        self.current_monologue: str = ""
 
         self.playing: bool = False
         self.fade: int = 0
@@ -209,39 +241,64 @@ class Dialogue:
     def start(self) -> None:
         self.playing = True
         self.fading = FADE_SPEED
-        self.current_monologue.fading = FADE_SPEED
-        self.current_monologue.is_reset = False
+        for (monologue_id, conditions) in self.start_monologues:
+            if conditions.satisfied():
+                self.current_monologue = monologue_id
+                break
+        while not self.monologues.get(self.current_monologue).conditions.satisfied():
+            self.current_monologue = self.monologues.get(self.current_monologue).alt_monologue
+        self.monologues.get(self.current_monologue).fading = FADE_SPEED
+        self.monologues.get(self.current_monologue).is_reset = False
 
     def end(self) -> None:
         self.playing = False
         self.fading = -FADE_SPEED * 0.7
-        self.current_monologue.fading = -FADE_SPEED * 0.7
+        self.monologues.get(self.current_monologue).fading = -FADE_SPEED * 0.7
 
     def reset(self) -> None:
-        self.start_monologue.reset()
-        self.current_monologue = self.start_monologue
+        for _, monologue in self.monologues.items():
+            monologue.reset()
+        for (monologue_id, conditions) in self.start_monologues:
+            if conditions.satisfied():
+                self.current_monologue = monologue_id
+                break
 
-    def choose_option(self) -> None:
-        self.current_monologue = self.current_monologue.choose(self.choice_index)
-        self.current_monologue.is_reset = False
+    def handle_new_monologue(self, scene):
+        route: str | None = self.monologues.get(self.current_monologue).get_set_route()
 
-    def load_monologue(self, monologue: Monologue) -> None:
-        self.current_monologue = monologue
-        self.current_monologue.is_reset = False
+        if route is not None:
+            scene.entities[self.entity_id].set_route(route)
 
-    def input(self, keys: pygame.key.ScancodeWrapper) -> None:
+    def choose_option(self, scene) -> None:
+        self.current_monologue = self.monologues.get(self.current_monologue).choose(self.choice_index)
+        while not self.monologues.get(self.current_monologue).conditions.satisfied():
+            self.current_monologue = self.monologues.get(self.current_monologue).alt_monologue
+        self.monologues.get(self.current_monologue).is_reset = False
+        self.handle_new_monologue(scene)
+
+    def load_monologue(self, monologue_id: str, scene) -> None:
+        self.current_monologue = monologue_id
+        while not self.monologues.get(self.current_monologue).conditions.satisfied():
+            self.current_monologue = self.monologues.get(self.current_monologue).alt_monologue
+        self.monologues.get(self.current_monologue).is_reset = False
+        self.handle_new_monologue(scene)
+
+    def input(self, scene, keys: pygame.key.ScancodeWrapper) -> None:
         if not self.playing: return
         if keys[pygame.K_RETURN] or keys[pygame.K_SPACE]:
             if self.advance_block: return
             self.advance_block = True
 
-            if self.current_monologue.awaiting_choice:
-                self.choose_option()
+            if self.monologues.get(self.current_monologue).awaiting_choice:
+                self.choose_option(scene)
                 return
 
-            new_monologue: Monologue | None = self.current_monologue.advance()
+            new_monologue: str | None = self.monologues.get(self.current_monologue).advance()
+            if new_monologue == "":
+                return
+
             if new_monologue is not None:
-                self.load_monologue(new_monologue)
+                self.load_monologue(new_monologue, scene)
             else:
                 self.end()
         else:
@@ -251,9 +308,9 @@ class Dialogue:
         self.fade = pygame.math.clamp(self.fade + self.fading * dt, 0, 255)
 
         if self.playing and self.fade == 255:
-            self.current_monologue.update(dt)
+            self.monologues.get(self.current_monologue).update(dt)
         else:
-            self.current_monologue.update_fade(dt)
+            self.monologues.get(self.current_monologue).update_fade(dt)
 
         self.choice_index = ui_manager.choice
 
@@ -278,12 +335,13 @@ class Dialogue:
         if not self.playing and self.fade == 0: return
 
         self.draw_dialogue_box()
-        self.current_monologue.render(self.draw_surface, dims, ui_manager)
+        self.monologues.get(self.current_monologue).render(self.draw_surface, dims, ui_manager)
 
         if self.fade < 255:
             self.draw_surface.set_alpha(self.fade)
 
         surface.blit(self.draw_surface, dims)
 
-        if self.playing and self.current_monologue.line_finished() and not self.current_monologue.awaiting_choice:
+        if self.playing and self.monologues.get(self.current_monologue).line_finished() and \
+                not self.monologues.get(self.current_monologue).awaiting_choice:
             self.draw_triangle(surface, dims)

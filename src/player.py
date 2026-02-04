@@ -5,18 +5,16 @@ from src.camera import Camera
 from src.config import Config
 from src.entity import Entity
 from src.map_element import MapElement
+from src.route_tracker import Conditions
 from src.sprite import Sprite
 from src.sprite import dir_to_str
 from src.ui_manager import UIManager
 
 
 class Player(Entity):
-    def __init__(self, grid_pos: pygame.Vector2, sprite: Sprite, move_duration: float):
-        super().__init__(grid_pos, sprite, False)
+    def __init__(self, spawn: pygame.Vector2, sprite: Sprite, move_duration: float):
+        super().__init__(sprite, True, spawn, Conditions([], [], []), {})
 
-        self.pos: pygame.Vector2 = grid_pos * Config.TILE_SIZE
-        self.moving: bool = False
-        self.move_time: float = 0.0
         self.move_duration: float = move_duration
 
     def set_sprite(self, sprite: Sprite, hit_box: pygame.Vector2) -> None:
@@ -40,7 +38,8 @@ class Player(Entity):
             self.moving = True
             self.move_time = 0.0
 
-    def update(self, entities: list[Entity], map_elements: list[MapElement], ui_manager: UIManager, dt: float) -> None:
+    def update(self, entities: dict[str, Entity], map_elements: list[MapElement], ui_manager: UIManager, dt: float)\
+            -> None:
         self.sprite.set(dir_to_str(self.velocity, self.facing))
         self.sprite.update(dt)
 
@@ -49,7 +48,7 @@ class Player(Entity):
 
         target_grid_pos: pygame.Vector2 = self.grid_pos + self.velocity
         rect: pygame.Rect = pygame.Rect(target_grid_pos, self.hit_box)
-        for entity in entities:
+        for _, entity in entities.items():
             if entity.get_collision(rect):
                 self.moving = False
                 self.velocity = pygame.Vector2(0, 0)
