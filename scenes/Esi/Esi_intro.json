@@ -99,7 +99,7 @@
           {
             "speaker": "Big Man",
             "lines": [
-              "Yes. They trade guns for people. A gun lasts years. A person is spent once."
+              "Yes. They trade guns for people."
             ],
             "char_speeds": [0.05],
             "font": "snake64",
@@ -159,10 +159,9 @@
           {
             "speaker": "Big Man",
             "lines": [
-              "They call me that because I learned\nwhen to bend.",
-              "Strength that never bends snaps."
+              "They call me that because I learned when to bend."
             ],
-            "char_speeds": [0.05, 0.05],
+            "char_speeds": [0.05],
             "font": "snake64",
             "options": [],
             "speaker_image": "big_man_portait",
@@ -180,10 +179,9 @@
           {
             "speaker": "Big Man",
             "lines": [
-              "...",
-              "Danger is always nearby. Today it\nhas not chosen us."
+              "Danger is always nearby. Today it has not chosen us."
             ],
-            "char_speeds": [0.15, 0.05],
+            "char_speeds": [0.15],
             "font": "snake64",
             "options": [],
             "speaker_image": "big_man_portait",
@@ -200,7 +198,7 @@
           },
           {
             "speaker": "Big Man",
-            "lines": ["Tomorrow is why we stay alert, not\nafraid."],
+            "lines": ["Tomorrow is why we stay alert, not afraid."],
             "char_speeds": [0.05],
             "font": "snake64",
             "options": [],
@@ -209,7 +207,7 @@
           },
           {
             "speaker": "Esi",
-            "lines": ["If something happens... what should\nI do?"],
+            "lines": ["If something happens... what should I do?"],
             "char_speeds": [0.05],
             "font": "snake64",
             "options": [],
@@ -219,10 +217,9 @@
           {
             "speaker": "Big Man",
             "lines": [
-              "Stay close to your mother. Watch\nbefore you speak.",
-              "Remember what you see."
+              "Make your decisions carefully."
             ],
-            "char_speeds": [0.05, 0.05],
+            "char_speeds": [0.05],
             "font": "snake64",
             "options": [],
             "speaker_image": "big_man_portait",
@@ -240,7 +237,7 @@
           {
             "speaker": "Big Man",
             "lines": [
-              "Good. Knowing what is happening is\nhow people survive longer than others."
+              "Good. Knowing what is happening is how people survive longer."
             ],
             "char_speeds": [0.05],
             "font": "snake64",
