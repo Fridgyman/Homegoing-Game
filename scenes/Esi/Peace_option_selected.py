@@ -14,12 +14,9 @@ class EnduranceEngine(nn.Module):
             x = torch.tensor([w, h], dtype=torch.float32)
             return 4.0 + (torch.sigmoid(self.fc(x)).item() * 2.5)
 
-def draw_pixel_esi():
-    s = pygame.Surface((32, 32), pygame.SRCALPHA)
-    pygame.draw.rect(s, (100, 60, 20), (10, 6, 12, 18)) 
-    pygame.draw.rect(s, (255, 200, 0), (10, 18, 12, 8)) 
-    pygame.draw.rect(s, (10, 10, 10), (10, 2, 12, 6))   
-    return s
+def load_esi_sprite():
+    path = os.path.join("assets", "images", "Esi.png")
+    return pygame.image.load(path).convert_alpha()
 
 def draw_pixel_raider():
     s = pygame.Surface((32, 32), pygame.SRCALPHA)
@@ -27,6 +24,10 @@ def draw_pixel_raider():
     pygame.draw.rect(s, (255, 255, 255), (10, 12, 2, 2)) 
     pygame.draw.rect(s, (255, 255, 255), (20, 12, 2, 2)) 
     return s
+
+def load_attacker_sprite():
+    path = os.path.join("assets", "images", "attacker_for_minigame.png")
+    return pygame.image.load(path).convert_alpha()
 
 def draw_pixel_tree():
     s = pygame.Surface((64, 80), pygame.SRCALPHA)
@@ -45,6 +46,8 @@ class EsiEscapeGame:
         font_path = os.path.join("assets", "fonts", "Snake.ttf")
         self.font = pygame.font.Font(font_path, 64)
         self.sprite_scale = 1.25
+        self.esi_scale = self.sprite_scale * 1.15
+        self.attacker_scale = self.sprite_scale * 1.1
         self.tree_offset_x = int(26 * self.sprite_scale)
         self.tree_offset_y = int(40 * self.sprite_scale)
         self.world_width = 12000
@@ -55,8 +58,8 @@ class EsiEscapeGame:
         self.move_speed = self.engine.get_speed(will, heritage) * 1.3
         
         
-        self.esi_sprite = self._scale_sprite(draw_pixel_esi())
-        self.raider_sprite = self._scale_sprite(draw_pixel_raider())
+        self.esi_sprite = self._scale_sprite(load_esi_sprite(), self.esi_scale)
+        self.raider_sprite = self._scale_sprite(load_attacker_sprite(), self.attacker_scale)
         self.tree_sprite = self._scale_sprite(draw_pixel_tree())
         self.background_surface = self._build_background()
         
@@ -67,7 +70,7 @@ class EsiEscapeGame:
         )
         
         self.trees = []
-        for _ in range(100):
+        for _ in range(115):
             tx = random.randint(150, self.world_width - 100)
             ty = random.randint(50, self.world_height - 100)
             self.trees.append(pygame.Rect(
@@ -82,9 +85,10 @@ class EsiEscapeGame:
         self.invincible_timer = 120 # 2 seconds of grace at 60fps        
         self.running = True
 
-    def _scale_sprite(self, surface):
-        width = int(surface.get_width() * self.sprite_scale)
-        height = int(surface.get_height() * self.sprite_scale)
+    def _scale_sprite(self, surface, scale=None):
+        scale = self.sprite_scale if scale is None else scale
+        width = int(surface.get_width() * scale)
+        height = int(surface.get_height() * scale)
         return pygame.transform.scale(surface, (width, height))
 
     def _build_background(self):
@@ -113,13 +117,15 @@ class EsiEscapeGame:
         
         if len(self.raiders) >= 30:
             self.raiders.pop(0)
+        rect = pygame.Rect(
+            x, y,
+            int(24 * self.sprite_scale),
+            int(28 * self.sprite_scale)
+        )
         self.raiders.append({
-            "rect": pygame.Rect(
-                x, y,
-                int(24 * self.sprite_scale),
-                int(28 * self.sprite_scale)
-            ),
-            "speed": random.uniform(3.2, 4.5)
+            "rect": rect,
+            "pos": pygame.Vector2(rect.centerx, rect.centery),
+            "speed": random.uniform(4.4, 5.5)
         })
 
     def move_with_collision(self, rect, dx, dy):
@@ -200,7 +206,7 @@ class EsiEscapeGame:
             self.camera_x = max(0, min(self.player_rect.centerx - self.screen_w // 2, self.world_width - self.screen_w))
 
             self.spawn_timer += 1
-            if self.spawn_timer > 75:
+            if self.spawn_timer > 60:
                 self.spawn_raider()
                 self.spawn_timer = 0
 
@@ -208,10 +214,14 @@ class EsiEscapeGame:
                 self.invincible_timer -= 1
 
             for r in self.raiders:
-                rdx = r["speed"] if r["rect"].x < self.player_rect.x else -r["speed"]
-                rdy = r["speed"] if r["rect"].y < self.player_rect.y else -r["speed"]
-                
-                self.move_with_collision(r["rect"], rdx, rdy)
+                dx = self.player_rect.centerx - r["pos"].x
+                dy = self.player_rect.centery - r["pos"].y
+                dist = math.hypot(dx, dy)
+                if dist != 0:
+                    rdx = r["speed"] * dx / dist
+                    rdy = r["speed"] * dy / dist
+                    self.move_with_collision(r["rect"], rdx, rdy)
+                    r["pos"].update(r["rect"].centerx, r["rect"].centery)
                 
                 if self.invincible_timer <= 0:
                     if r["rect"].colliderect(self.player_rect):
@@ -232,14 +242,7 @@ class EsiEscapeGame:
                 )
             
             self.screen.blit(self.esi_sprite, (self.player_rect.x - self.camera_x, self.player_rect.y))
-            if self.invincible_timer > 0:
-                pygame.draw.circle(
-                    self.screen,
-                    (255, 255, 255),
-                    (self.player_rect.centerx - self.camera_x, self.player_rect.centery),
-                    30,
-                    2
-                )
+            # Invincibility grace period stays, but no on-screen circle.
             
             for r in self.raiders:
                 self.screen.blit(self.raider_sprite, (r["rect"].x - self.camera_x, r["rect"].y))
@@ -256,7 +259,7 @@ class EsiEscapeGame:
 
     def end_screen(self, captured):
         self.screen.fill((0, 0, 0))
-        msg = "CAPTURED: THE CASTLE AWAITS" if captured else "ESCAPED: THE SPIRITS PROTECT YOU"
+        msg = "CAPTURED: You were caught in the escape!" if captured else "ESCAPED: You escaped your fate!"
         color = (255, 0, 0) if captured else (0, 255, 0)
 
         words = msg.split(" ")
