@@ -1,13 +1,9 @@
 import json
 
-import pygame
-
-from src.asset_manager import AssetManager
-from src.camera import Camera
 from src.dialogue import Monologue, Dialogue, MonologueOption, MonologueLine
 from src.entity import Entity
-from src.entity_route import EntityRoute, Waypoint
-from src.event import DispatchEvent
+from src.entity_route import Waypoint
+from src.event import *
 from src.map_element import MapElement
 from src.npc import NPC
 from src.player import Player
@@ -15,6 +11,7 @@ from src.route_tracker import Conditions
 from src.scene import Scene
 from src.scene_in_out import SceneEntrance, SceneExit, str_to_scene_transition
 from src.sprite import Sprite, copy_sprite
+from src.trigger import Trigger
 from src.ui_manager import UIManager
 
 
@@ -54,35 +51,115 @@ def parse_entity_route(route_obj: dict) -> EntityRoute:
 
     return EntityRoute(waypoints=waypoints, conditions=conditions)
 
-def parse_dispatch(dispatch_obj: dict) -> DispatchEvent:
-    pass
+def parse_catch(catch_obj: dict) -> CatchEvent | None:
+    name: str = catch_obj.get("name", "")
+    match name:
+        case "on_player_enter":
+            rect_obj: dict = catch_obj.get("rect", {})
+            event = OnPlayerEnter(
+                rect=pygame.Rect(rect_obj.get("x", 0), rect_obj.get("y", 0), rect_obj.get("w", 0), rect_obj.get("h", 0))
+            )
+        case "on_entity_enter":
+            rect_obj: dict = catch_obj.get("rect", {})
+            event = OnEntityEnter(
+                ids=[ind for ind in catch_obj.get("ids", [])],
+                rect=pygame.Rect(rect_obj.get("x", 0), rect_obj.get("y", 0), rect_obj.get("w", 0), rect_obj.get("h", 0))
+            )
+        case "on_scene_enter":
+            event = OnSceneStart()
+        case "on_scene_exit":
+            event = OnSceneExit()
+        case _:
+            return None
+
+    event.conditions = parse_conditions(catch_obj.get("conditions", {}))
+    return event
+
+def parse_dispatch(dispatch_obj: dict) -> DispatchEvent | None:
+    name: str = dispatch_obj.get("name", "")
+    match name:
+        case "add_entity":
+            event = AddEntity(
+                ids=[ind for ind in dispatch_obj.get("ids", [])]
+            )
+        case "remove_entity":
+            event = RemoveEntity(
+                ids=[ind for ind in dispatch_obj.get("ids", [])]
+            )
+        case "set_route":
+            event = SetEntityRoute(
+                entity_id=dispatch_obj.get("entity_id", ""),
+                route_id=dispatch_obj.get("route_id", "")
+            )
+        case "start_entity_dialogue":
+            event = BeginEntityDialogue(
+                entity_id=dispatch_obj.get("entity_id", ""),
+                dialogue_id=dispatch_obj.get("dialogue_id", "")
+            )
+        case "start_independent_dialogue":
+            event = BeginIndependentDialogue(
+                dialogue=parse_dialogue(
+                    dialogue_obj=dispatch_obj.get("dialogue"),
+                    entity_id=""
+                )
+            )
+        case "end_dialogue":
+            event = EndDialogueAbruptly()
+        case "move_camera_to_pos":
+            pos_obj: dict = dispatch_obj.get("pos", {})
+            event = MoveCameraPosition(
+                pos=pygame.Vector2(pos_obj.get("x", 0), pos_obj.get("y", 0)),
+                duration=dispatch_obj.get("duration", 0)
+            )
+        case "move_camera_to_entity":
+            event = MoveCameraEntity(
+                entity_id=dispatch_obj.get("entity_id", ""),
+                duration=dispatch_obj.get("duration", 0)
+            )
+        case "move_camera_follow_entity":
+            event = MoveCameraFollowEntity(
+                entity_id=dispatch_obj.get("entity_id", ""),
+            )
+        case "move_player":
+            waypoints: dict = dispatch_obj.get("waypoints")
+            event = MovePlayer(
+                parse_entity_route({"waypoints": waypoints})
+            )
+        case "reset_camera":
+            event = ResetCamera()
+        case "shake_camera":
+            event = ShakeCamera(
+                time=dispatch_obj.get("time", 0)
+            )
+        case "stop_shake_camera":
+            event = EndCameraShake()
+        case "play_audio":
+            event = PlayAudio(
+                audio_id=dispatch_obj.get("identifier", ""),
+                volume=dispatch_obj.get("volume", 0)
+            )
+        case "enable_trigger":
+            event = EnableTrigger(
+                trigger_id=dispatch_obj.get("identifier", "")
+            )
+        case "disable_trigger":
+            event = DisableTrigger(
+                trigger_id=dispatch_obj.get("identifier", "")
+            )
+        case _:
+            return None
+
+    event.conditions = parse_conditions(dispatch_obj.get("conditions", {}))
+    event.wait_for_previous = dispatch_obj.get("wait_for_previous", False)
+    event.wait = dispatch_obj.get("wait", 0)
+    event.org_wait = event.wait
+    return event
 
 def parse_monologue_option(option_obj: dict) -> MonologueOption:
-    dispatch_events: list[DispatchEvent] = []
-    dispatch_objs: list = option_obj.get("dispatch_on_select", [])
-    for dispatch_obj in dispatch_objs:
-        dispatch_events.append(parse_dispatch(dispatch_obj))
-
-    modify_flags: list[tuple[str, str]] = []
-    modify_flags_objs: list = option_obj.get("modify_flags_on_select", [])
-    for modify_flags_obj in modify_flags_objs:
-        modify_flags.append((modify_flags_obj.get("how", ""), modify_flags_obj.get("value", "")))
-
-    set_route: list[tuple[str, Conditions]] = []
-    set_routes_obj: list = option_obj.get("set_route_on_reach", [])
-    for set_route_obj in set_routes_obj:
-        set_route.append((
-            set_route_obj.get("id", ""),
-            parse_conditions(set_route_obj.get("conditions", {}))
-        ))
-
     return MonologueOption(
         text=option_obj.get("text", ""),
         next_monologue=option_obj.get("next_monologue", ""),
-        conditions=parse_conditions(option_obj.get("conditions", {})),
-        dispatch=dispatch_events,
-        modify_flags=modify_flags,
-        set_route=set_route
+        conditions=parse_conditions(option_obj.get("conditions", {}))
     )
 
 def parse_monologue(monologue_obj: dict) -> Monologue:
@@ -110,6 +187,11 @@ def parse_monologue(monologue_obj: dict) -> Monologue:
     for dispatch_obj in dispatch_objs:
         dispatch_events.append(parse_dispatch(dispatch_obj))
 
+    modify_flags: list[tuple[str, str]] = []
+    modify_flags_objs: list = monologue_obj.get("modify_flags_on_reach", [])
+    for modify_flags_obj in modify_flags_objs:
+        modify_flags.append((modify_flags_obj.get("how", ""), modify_flags_obj.get("value", "")))
+
     options: list[MonologueOption] = []
     options_obj: dict = monologue_obj.get("options", {})
     for option_obj in options_obj:
@@ -131,7 +213,8 @@ def parse_monologue(monologue_obj: dict) -> Monologue:
         font=AssetManager.get_font(monologue_obj.get("font", "")),
         next_monologue=monologue_obj.get("next_monologue", None),
         set_route=set_route,
-        dispatch=dispatch_events,
+        dispatch=DispatchChain(dispatch_events),
+        modify_flags=modify_flags,
         options=options,
         speaker_image=speaker_image,
         speaking_sfx=speaking_sfx
@@ -139,16 +222,6 @@ def parse_monologue(monologue_obj: dict) -> Monologue:
 
 
 def parse_dialogue(dialogue_obj: dict, entity_id: str) -> Dialogue:
-    modify_flags: list[tuple[str, str]] = []
-    modify_flags_objs: list = dialogue_obj.get("modify_flags_on_start", [])
-    for modify_flags_obj in modify_flags_objs:
-        modify_flags.append((modify_flags_obj.get("how", ""), modify_flags_obj.get("value", "")))
-
-    dispatch_events: list[DispatchEvent] = []
-    dispatch_objs: list = dialogue_obj.get("dispatch_on_start", [])
-    for dispatch_obj in dispatch_objs:
-        dispatch_events.append(parse_dispatch(dispatch_obj))
-
     start_monologues: list[tuple[str, Conditions]] = []
     start_monologues_obj: list = dialogue_obj.get("start_monologue", [])
     for start_monologue_obj in start_monologues_obj:
@@ -164,8 +237,6 @@ def parse_dialogue(dialogue_obj: dict, entity_id: str) -> Dialogue:
 
     return Dialogue(
         conditions=parse_conditions(dialogue_obj.get("conditions", {})),
-        modify_flags=modify_flags,
-        dispatch=dispatch_events,
         start_monologues=start_monologues,
         monologues=monologues,
         entity_id=entity_id
@@ -183,8 +254,9 @@ def parse_scene(scene_obj: dict) -> Scene:
     bounds = pygame.Vector2(bounds_obj.get("x", 0), bounds_obj.get("y", 0))
 
     background_music_obj: dict = scene_obj.get("background_music", {})
-    background_music: pygame.mixer.Sound = AssetManager.get_audio(background_music_obj.get("identifier", ""))
-    background_music.set_volume(background_music_obj.get("volume", 1))
+    background_music: pygame.mixer.Sound = pygame.mixer.Sound(
+        AssetManager.get_audio(background_music_obj.get("identifier", "")))
+    background_music.set_volume(background_music_obj.get("volume", 0))
 
     map_elements_obj: list = scene_obj.get("map_elements", [])
     map_elements: list[MapElement] = []
@@ -217,6 +289,16 @@ def parse_scene(scene_obj: dict) -> Scene:
         sprite=copy_sprite(entity_lookup.get(player_obj.get("lookup", ""))[0]),
         move_duration=player_obj.get("move_duration", 0)
     )
+
+    triggers: dict[str, Trigger] = {}
+    triggers_obj: list = scene_obj.get("triggers", [])
+    for trigger_obj in triggers_obj:
+        triggers[trigger_obj.get("identifier", "")] = Trigger(
+            disabled=trigger_obj.get("disabled", False),
+            once=trigger_obj.get("once", False),
+            catch=[parse_catch(e) for e in trigger_obj.get("catch", [])],
+            dispatch=[parse_dispatch(e) for e in trigger_obj.get("dispatch", [])]
+        )
 
     entrances: dict[str, SceneEntrance] = {}
     entrances_obj: list = scene_obj.get("entrances", [])
@@ -292,6 +374,7 @@ def parse_scene(scene_obj: dict) -> Scene:
         map_elements=map_elements,
         player=player,
         entities=entities,
+        triggers=triggers,
         entrances=entrances,
         exits=exits
     )
@@ -321,21 +404,22 @@ class SceneManager:
     def add_scene(self, name: str, scene: Scene) -> None:
         self.scenes[name] = scene
 
-    def load_scene(self, scene_name: str, entrance_id: str, player_face_dir: pygame.Vector2) -> None:
+    def load_scene(self, scene_name: str, entrance_id: str, player_face_dir: pygame.Vector2,
+                   from_continue: bool = False) -> None:
         if self.current_scene != "":
             self.scenes[self.current_scene].unload()
-        self.scenes[scene_name].load(entrance_id, player_face_dir)
+        self.scenes[scene_name].load(entrance_id, player_face_dir, from_continue)
         self.current_scene = scene_name
 
     def input(self, ui_manager: UIManager, keys: pygame.key.ScancodeWrapper) -> None:
         self.scenes[self.current_scene].input(ui_manager, keys)
 
-    def update(self, camera: Camera, ui_manager: UIManager, dt: float) -> None:
+    def update(self, ui_manager: UIManager, dt: float) -> None:
         self.fade = pygame.math.clamp(self.fade + self.fading * dt, 0, 255)
-        self.scenes[self.current_scene].update(camera, ui_manager, dt, self)
+        self.scenes[self.current_scene].update(ui_manager, dt, self)
 
-    def render(self, window_surface: pygame.Surface, camera: Camera, ui_manager: UIManager) -> None:
-        self.scenes[self.current_scene].render(window_surface, camera, ui_manager)
+    def render(self, window_surface: pygame.Surface, ui_manager: UIManager) -> None:
+        self.scenes[self.current_scene].render(window_surface, ui_manager)
 
         if self.fade > 0:
             self.overlay.set_alpha(self.fade)

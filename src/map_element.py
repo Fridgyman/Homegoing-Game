@@ -18,10 +18,10 @@ class MapElement:
     def get_collision(self, rect: pygame.Rect) -> bool:
         return self.collision and rect.colliderect(self.rect)
 
-    def render(self, surface: pygame.Surface, camera: Camera) -> None:
+    def render(self, surface: pygame.Surface) -> None:
         centered: pygame.Vector2 = pygame.Vector2(self.rect.topleft) * Config.TILE_SIZE - self.image_dims / 2
         centered.x -= self.image_dims.y - Config.TILE_SIZE
-        surface.blit(self.render_surface, camera.world_pos_to_view_pos(centered))
+        surface.blit(self.render_surface, Camera.world_pos_to_view_pos(centered))
 
     def _generate_render_surface(self, image: pygame.Surface, dims: pygame.Vector2) -> None:
         self.render_surface = pygame.Surface((dims.x * Config.TILE_SIZE, dims.y * Config.TILE_SIZE)).convert()

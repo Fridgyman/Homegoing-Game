@@ -2,23 +2,23 @@ class Flags:
     DEFINED: dict[str, bool] = {}
 
     @classmethod
-    def is_set(cls, flag: str):
+    def is_set(cls, flag: str) -> bool:
         return cls.DEFINED.get(flag, False)
 
     @classmethod
-    def set(cls, flag: str):
+    def set(cls, flag: str) -> None:
         cls.DEFINED[flag] = True
 
     @classmethod
-    def clear(cls, flag: str):
+    def clear(cls, flag: str) -> None:
         cls.DEFINED[flag] = False
 
     @classmethod
-    def toggle(cls, flag: str):
+    def toggle(cls, flag: str) -> None:
         cls.DEFINED[flag] = not cls.DEFINED.get(flag, False)
 
     @classmethod
-    def modify(cls, flag: str, how: str):
+    def modify(cls, flag: str, how: str) -> None:
         match how:
             case "add":
                 cls.set(flag)

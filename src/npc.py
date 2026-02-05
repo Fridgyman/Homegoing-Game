@@ -24,27 +24,29 @@ class NPC(Entity, Interactable):
     def can_interact(self, player: Player) -> bool:
         return pygame.Rect(self.grid_pos, self.hit_box).collidepoint(player.grid_pos + player.facing)
     
-    def interact(self, player: Player) -> Dialogue | None:
+    def interact(self, player: Player, dialogue: str | None = None) -> Dialogue | None:
         if self.block:
             return None
 
-        for k, v in self.dialogues.items():
-            if v.conditions.satisfied():
-                self.current_dialogue = k
-                break
+        if dialogue is None:
+            for k, v in self.dialogues.items():
+                if v.conditions.satisfied():
+                    self.current_dialogue = k
+                    break
 
-        if self.current_dialogue is None:
-            return None
+            if self.current_dialogue is None:
+                return None
+        else:
+            self.current_dialogue = dialogue
 
         self.look_at(player.grid_pos)
-        self.dialogues.get(self.current_dialogue).start()
         self.block = True
         return self.dialogues.get(self.current_dialogue, None)
 
     def input(self, keys: pygame.key.ScancodeWrapper) -> None:
         pass
 
-    def update(self, entities: dict[str, Entity], map_elements: list[MapElement], ui_manager: UIManager, dt: float)\
+    def update(self, entities: list[Entity], map_elements: list[MapElement], ui_manager: UIManager, dt: float)\
             -> None:
         if self.waypoint_wait_time != 0:
             self.waypoint_wait_time -= dt
@@ -77,7 +79,7 @@ class NPC(Entity, Interactable):
 
             collision: bool = False
             rect: pygame.Rect = pygame.Rect(target_grid_pos, self.hit_box)
-            for _, entity in entities.items():
+            for entity in entities:
                 if entity.get_collision(rect):
                     self.moving = False
                     self.velocity = pygame.Vector2(0, 0)

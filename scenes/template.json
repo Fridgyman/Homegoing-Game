@@ -69,17 +69,6 @@
 						"not": ["--flags--"]
 					},
 
-					"modify_flags_on_start": [
-						{ "how": "--remove/add/toggle--", "value": "--flag--" }
-					],
-
-					"dispatch_on_start": [
-						{
-							"name": "--event identifier--",
-							"--additional arguments--": null
-						}
-					],
-
 					"start_monologue": [
 						{
 							"id": "--monologue identifier--",
@@ -131,6 +120,10 @@
 								}
 							],
 
+							"modify_flags_on_reach": [
+								{ "how": "--remove/add/toggle--", "value": "--flag--" }
+							],
+
 							"options": [
 								{
 									"text": "--option text--",
@@ -139,18 +132,7 @@
 										"all": ["--flags--"],
 										"any": ["--flags--"],
 										"not": ["--flags--"]
-									},
-
-									"dispatch_on_select": [
-										{
-											"name": "--event identifier--",
-											"--additional arguments--": null
-										}
-									],
-
-									"modify_flags_on_select": [
-										{ "how": "--remove/add/toggle--", "value": "--flag--" }
-									]
+									}
 								}
 							]
 						}
@@ -162,8 +144,9 @@
 
 	"triggers": [
 		{
-			"id": "--optional: identifier--",
-			"once?": false,
+			"identifier": "--optional: identifier--",
+			"disabled": false,
+			"once": false,
 			"catch": [
 				{
 					"name": "--event identifier--",

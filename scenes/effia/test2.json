@@ -57,10 +57,6 @@
 						"not": []
 					},
 
-					"modify_flags_on_start": [],
-
-					"dispatch_on_start": [],
-
 					"start_monologue": [
 						{
 							"id": "start",
@@ -102,6 +98,8 @@
 
 							"dispatch_on_reach": [],
 
+                            "modify_flags_on_reach": [],
+
 							"options": []
 						},
                         {
@@ -128,6 +126,8 @@
                             "set_route_on_reach": [],
 
                             "dispatch_on_reach": [],
+
+                            "modify_flags_on_reach": [],
 
                             "options": []
                         },
@@ -156,6 +156,8 @@
 
                             "dispatch_on_reach": [],
 
+                            "modify_flags_on_reach": [],
+
                             "options": [
 								{
 									"text": "okay bye",
@@ -164,13 +166,7 @@
 										"all": [],
 										"any": [],
 										"not": []
-									},
-
-									"dispatch_on_select": [],
-
-									"modify_flags_on_select": [],
-
-									"set_route_on_select": []
+									}
 								},
                                 {
 									"text": "damn ok",
@@ -179,13 +175,7 @@
 										"all": [],
 										"any": [],
 										"not": []
-									},
-
-									"dispatch_on_select": [],
-
-									"modify_flags_on_select": [],
-
-									"set_route_on_select": []
+									}
 								}
 							]
                         },
@@ -214,6 +204,8 @@
 
                             "dispatch_on_reach": [],
 
+                            "modify_flags_on_reach": [],
+
                             "options": []
                         },
                         {
@@ -240,6 +232,8 @@
                             "set_route_on_reach": [],
 
                             "dispatch_on_reach": [],
+
+                            "modify_flags_on_reach": [],
 
                             "options": []
                         }

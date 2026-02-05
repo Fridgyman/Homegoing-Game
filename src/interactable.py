@@ -10,5 +10,5 @@ class Interactable:
     def can_interact(self, player: Player) -> bool:
         return not self.block
 
-    def interact(self, player: Player) -> Dialogue | None:
+    def interact(self, player: Player, dialogue: str | None = None) -> Dialogue | None:
         pass

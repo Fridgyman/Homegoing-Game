@@ -65,7 +65,7 @@ class Entity:
     def input(self, keys: pygame.key.ScancodeWrapper) -> None:
         pass
 
-    def update(self, entities: dict, map_elements: list[MapElement], ui_manager: UIManager, dt: float) -> None:
+    def update(self, entities: list, map_elements: list[MapElement], ui_manager: UIManager, dt: float) -> None:
         if self.waypoint_wait_time != 0:
             self.waypoint_wait_time -= dt
             if self.waypoint_wait_time < 0:
@@ -97,7 +97,7 @@ class Entity:
 
             collision: bool = False
             rect: pygame.Rect = pygame.Rect(target_grid_pos, self.hit_box)
-            for _, entity in entities.items():
+            for entity in entities:
                 if entity.get_collision(rect):
                     self.moving = False
                     self.velocity = pygame.Vector2(0, 0)
@@ -137,6 +137,6 @@ class Entity:
 
         self.sprite.update(dt)
 
-    def render(self, surface: pygame.Surface, camera: Camera) -> None:
+    def render(self, surface: pygame.Surface) -> None:
         centered: pygame.Vector2 = self.pos - self.sprite.dimensions / 2
-        surface.blit(self.sprite.get() or AssetManager.NULL_IMAGE, camera.world_pos_to_view_pos(centered))
+        surface.blit(self.sprite.get() or AssetManager.NULL_IMAGE, Camera.world_pos_to_view_pos(centered))

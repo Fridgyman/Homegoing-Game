@@ -6,10 +6,12 @@ from src.camera import Camera
 from src.config import Config
 from src.dialogue import Dialogue
 from src.entity import Entity
+from src.event import DispatchChain
 from src.interactable import Interactable
 from src.map_element import MapElement
 from src.player import Player
 from src.scene_in_out import SceneEntrance, SceneExit
+from src.trigger import Trigger
 from src.ui_manager import UIManager
 
 BACKGROUND_MUSIC_FADE_MS = 1000
@@ -26,6 +28,7 @@ class Scene:
                  map_elements: list[MapElement],
                  player: Player,
                  entities: dict[str, Entity],
+                 triggers: dict[str, Trigger],
                  entrances: dict[str, SceneEntrance],
                  exits: list[SceneExit]
                  ):
@@ -36,9 +39,12 @@ class Scene:
         self.map_elements: list[MapElement] = map_elements
 
         self.player: Player = player
-        self.entities: dict[str, Entity] = entities
-        self.entities["PLAYER_RESERVED"] = self.player
+        self.entities_dict: dict[str, Entity] = entities
+        self.entities: list[Entity] = []
+        self.entities.append(self.player)
         self.dialogue: Dialogue | None = None
+
+        self.triggers: dict[str, Trigger] = triggers
 
         self.entrances: dict[str, SceneEntrance] = entrances
         self.entering_through: SceneEntrance | None = None
@@ -51,13 +57,26 @@ class Scene:
         self.void_surface.fill(self.void_color[:3])
         self.void_surface.set_alpha(self.void_color[3])
 
-    def load(self, entrance: str, player_face_dir: pygame.Vector2) -> None:
+        self.dispatch_chains: set[DispatchChain] = set()
+        self.added_dispatch_chains: set[DispatchChain] = set()
+        self.removed_dispatch_chains: set[DispatchChain] = set()
+
+    def add_dispatch_chain(self, chain: DispatchChain):
+        self.added_dispatch_chains.add(chain)
+        chain.start(self)
+
+    def remove_dispatch_chain(self, chain: DispatchChain):
+        self.removed_dispatch_chains.add(chain)
+
+    def load(self, entrance: str, player_face_dir: pygame.Vector2, from_continue: bool) -> None:
         if self.state != SceneState.EXITED: return
         self.state = SceneState.ENTERED
         self.background_music.play(loops=-1, fade_ms=BACKGROUND_MUSIC_FADE_MS)
 
-        if self.has_loaded_prev:
+        if from_continue:
             return
+
+        Camera.TRACK = self.player
 
         if self.entrances.get(entrance, None) is not None:
             self.player.grid_pos = self.entrances.get(entrance).spawn.copy()
@@ -66,13 +85,16 @@ class Scene:
         self.player.pos = self.player.grid_pos * Config.TILE_SIZE
         self.player.facing = player_face_dir.copy()
 
-        for _, entity in self.entities.items():
-            entity.load()
+        if self.has_loaded_prev:
+            return
+
+        for _, entity in self.entities_dict.items():
+            if entity.load():
+                self.entities.append(entity)
 
         self.has_loaded_prev = True
 
     def unload(self) -> None:
-        if self.state == SceneState.EXITED: return
         self.state = SceneState.EXITED
         self.background_music.fadeout(BACKGROUND_MUSIC_FADE_MS)
 
@@ -82,15 +104,21 @@ class Scene:
             ui_manager.input(keys)
             return
 
+        if self.player.controls_disabled:
+            return
+
         self.player.input(keys)
 
         if not (keys[pygame.K_SPACE] or keys[pygame.K_RETURN]): return
-        for k, entity in self.entities.items():
-            if k == "PLAYER_RESERVED":
+        for entity in self.entities:
+            if isinstance(entity, Player):
                 continue
             entity.input(keys)
             if isinstance(entity, Interactable) and entity.can_interact(self.player):
                 self.dialogue = entity.interact(self.player)
+                if self.dialogue is not None:
+                    self.dialogue.start(self)
+                    self.background_music.set_volume(self.background_music.get_volume() / 3)
 
         for scene_exit in self.exits:
             if not scene_exit.available():
@@ -100,14 +128,25 @@ class Scene:
                 self.state = SceneState.EXITING
                 break
 
-    def update(self, camera: Camera, ui_manager: UIManager, dt: float, manager) -> None:
-        camera.center_at(self.player.pos, self.bounds)
+    def update(self, ui_manager: UIManager, dt: float, manager) -> None:
+        Camera.update(self.bounds, dt)
 
         if self.state == SceneState.EXITED:
             manager.load_scene(self.exiting_through.next_scene,
                                self.exiting_through.next_entrance,
                                self.player.facing)
             self.exiting_through = None
+
+        self.dispatch_chains.update(self.added_dispatch_chains)
+        self.added_dispatch_chains.clear()
+        for chain in self.dispatch_chains:
+            chain.update(self, dt)
+        self.dispatch_chains = self.dispatch_chains.difference(self.removed_dispatch_chains)
+        self.removed_dispatch_chains.clear()
+
+        for _, trigger in self.triggers.items():
+            if trigger.catch(self):
+                trigger.dispatch(self)
 
         if self.entering_through is not None:
             self.entering_through.update(manager, dt)
@@ -139,27 +178,28 @@ class Scene:
                 break
 
         if self.dialogue is not None:
-            self.dialogue.update(ui_manager, dt)
+            self.dialogue.update(ui_manager, self, dt)
             if self.dialogue.fade == 0:
                 self.dialogue.reset()
                 self.dialogue = None
+                self.background_music.set_volume(self.background_music.get_volume() * 3)
 
         ui_manager.update()
 
-        for k, entity in self.entities.items():
-            if k == "PLAYER_RESERVED":
+        for entity in self.entities:
+            if isinstance(entity, Player):
                 continue
             entity.update(self.entities, self.map_elements, ui_manager, dt)
 
-    def render(self, window_surface: pygame.Surface, camera: Camera, ui_manager: UIManager) -> None:
+    def render(self, window_surface: pygame.Surface, ui_manager: UIManager) -> None:
         window_surface.fill((0, 0, 0))
         window_surface.blit(self.void_surface, (0, 0))
-        for k, entity in self.entities.items():
-            if k == "PLAYER_RESERVED":
+        for entity in self.entities:
+            if isinstance(entity, Player):
                 continue
-            entity.render(window_surface, camera)
-        for map_element in self.map_elements: map_element.render(window_surface, camera)
-        self.player.render(window_surface, camera)
+            entity.render(window_surface)
+        for map_element in self.map_elements: map_element.render(window_surface)
+        self.player.render(window_surface)
 
         if self.dialogue is not None:
             dims: pygame.Rect = pygame.Rect(

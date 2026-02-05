@@ -1,8 +1,8 @@
 import pygame
 
 from src.config import Config
-from src.event import DispatchEvent
-from src.route_tracker import Conditions
+from src.event import DispatchChain
+from src.route_tracker import Conditions, Flags
 from src.ui_manager import UIManager, Text, Button
 
 SPEAKER_IMAGE_MARGIN_LEFT = 15
@@ -25,15 +25,10 @@ class MonologueLine:
         self.speed: float = speed
 
 class MonologueOption:
-    def __init__(self, text: str, next_monologue: str, conditions: Conditions,
-                 dispatch: list[DispatchEvent], modify_flags: list[tuple[str, str]],
-                 set_route: list[tuple[str, Conditions]]):
+    def __init__(self, text: str, next_monologue: str, conditions: Conditions):
         self.text: str = text
         self.next_monologue: str = next_monologue
         self.conditions: Conditions = conditions
-        self.dispatch: list[DispatchEvent] = dispatch
-        self.modify_flags: list[tuple[str, str]] = modify_flags
-        self.set_route: list[tuple[str, Conditions]] = set_route
 
 
 class Monologue:
@@ -41,7 +36,7 @@ class Monologue:
                  conditions: Conditions, alt_monologue: str,
                  speaker: str, lines: list[MonologueLine], font: pygame.font.Font,
                  next_monologue: str | None, set_route: list[tuple[str, Conditions]],
-                 dispatch: list[DispatchEvent], options: list[MonologueOption],
+                 dispatch: DispatchChain, modify_flags: list[tuple[str, str]], options: list[MonologueOption],
                  speaker_image: pygame.Surface | None = None, speaking_sfx: pygame.mixer.Sound | None = None):
         self.conditions: Conditions = conditions
         self.alt_monologue: str = alt_monologue
@@ -52,7 +47,8 @@ class Monologue:
 
         self.next_monologue: str | None = next_monologue
         self.set_route: list[tuple[str, Conditions]] = set_route
-        self.dispatch: list[DispatchEvent] = dispatch
+        self.dispatch: DispatchChain = dispatch
+        self.modify_flags: list[tuple[str, str]] = modify_flags
         self.options: list[MonologueOption] = options
 
         self.speaking_sfx: pygame.mixer.Sound | None = speaking_sfx
@@ -151,6 +147,8 @@ class Monologue:
             self.char_duration = 0
             self.spoken += self.lines[self.line_index[0]].text[self.char_index[0]]
             self.char_index[0] += 1
+            if self.speaking_sfx is not None:
+                self.speaking_sfx.play(maxtime=int(self.lines[self.line_index[0]].speed * 2000))
 
         self.awaiting_choice = len(self.options) > 0 and self.line_finished() and self.last_rendered_line()
 
@@ -210,12 +208,9 @@ class Monologue:
 
 
 class Dialogue:
-    def __init__(self, conditions: Conditions, modify_flags: list[tuple[str, str]],
-                 dispatch: list[DispatchEvent], start_monologues: list[tuple[str, Conditions]],
+    def __init__(self, conditions: Conditions, start_monologues: list[tuple[str, Conditions]],
                  monologues: dict[str, Monologue], entity_id: str):
         self.conditions: Conditions = conditions
-        self.modify_flags: list[tuple[str, str]] = modify_flags
-        self.dispatch: list[DispatchEvent] = dispatch
         self.start_monologues: list[tuple[str, Conditions]] = start_monologues
         self.monologues: dict[str, Monologue] = monologues
 
@@ -238,7 +233,7 @@ class Dialogue:
             pygame.Vector2(1, -1)
         ]
 
-    def start(self) -> None:
+    def start(self, scene) -> None:
         self.playing = True
         self.fading = FADE_SPEED
         for (monologue_id, conditions) in self.start_monologues:
@@ -247,6 +242,7 @@ class Dialogue:
                 break
         while not self.monologues.get(self.current_monologue).conditions.satisfied():
             self.current_monologue = self.monologues.get(self.current_monologue).alt_monologue
+        self.handle_new_monologue(scene)
         self.monologues.get(self.current_monologue).fading = FADE_SPEED
         self.monologues.get(self.current_monologue).is_reset = False
 
@@ -267,7 +263,12 @@ class Dialogue:
         route: str | None = self.monologues.get(self.current_monologue).get_set_route()
 
         if route is not None:
-            scene.entities[self.entity_id].set_route(route)
+            scene.entities_dict[self.entity_id].set_route(route)
+
+        for (method, flag) in self.monologues.get(self.current_monologue).modify_flags:
+            Flags.modify(flag=flag, how=method)
+
+        scene.add_dispatch_chain(self.monologues.get(self.current_monologue).dispatch)
 
     def choose_option(self, scene) -> None:
         self.current_monologue = self.monologues.get(self.current_monologue).choose(self.choice_index)
@@ -304,7 +305,7 @@ class Dialogue:
         else:
             self.advance_block = False
 
-    def update(self, ui_manager: UIManager, dt: float) -> None:
+    def update(self, ui_manager: UIManager, scene, dt: float) -> None:
         self.fade = pygame.math.clamp(self.fade + self.fading * dt, 0, 255)
 
         if self.playing and self.fade == 255:

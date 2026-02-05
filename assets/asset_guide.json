@@ -3,6 +3,30 @@
     {
       "name": "effia_theme",
       "path": "assets/audio/effia_theme.flac"
+    },
+    {
+      "name": "alto_voice",
+      "path": "assets/audio/voices/alto.flac"
+    },
+    {
+      "name": "baritone_voice",
+      "path": "assets/audio/voices/baritone.flac"
+    },
+    {
+      "name": "bass_voice",
+      "path": "assets/audio/voices/bass.flac"
+    },
+    {
+      "name": "mezzo_soprano_voice",
+      "path": "assets/audio/voices/mezzo_soprano.flac"
+    },
+    {
+      "name": "soprano_voice",
+      "path": "assets/audio/voices/soprano.flac"
+    },
+    {
+      "name": "tenor_voice",
+      "path": "assets/audio/voices/tenor.flac"
     }
   ],
 

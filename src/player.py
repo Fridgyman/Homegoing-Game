@@ -16,6 +16,7 @@ class Player(Entity):
         super().__init__(sprite, True, spawn, Conditions([], [], []), {})
 
         self.move_duration: float = move_duration
+        self.controls_disabled: bool = False
 
     def set_sprite(self, sprite: Sprite, hit_box: pygame.Vector2) -> None:
         self.sprite = sprite
@@ -38,7 +39,7 @@ class Player(Entity):
             self.moving = True
             self.move_time = 0.0
 
-    def update(self, entities: dict[str, Entity], map_elements: list[MapElement], ui_manager: UIManager, dt: float)\
+    def update(self, entities: list[Entity], map_elements: list[MapElement], ui_manager: UIManager, dt: float)\
             -> None:
         self.sprite.set(dir_to_str(self.velocity, self.facing))
         self.sprite.update(dt)
@@ -48,7 +49,7 @@ class Player(Entity):
 
         target_grid_pos: pygame.Vector2 = self.grid_pos + self.velocity
         rect: pygame.Rect = pygame.Rect(target_grid_pos, self.hit_box)
-        for _, entity in entities.items():
+        for entity in entities:
             if entity.get_collision(rect):
                 self.moving = False
                 self.velocity = pygame.Vector2(0, 0)
@@ -75,6 +76,33 @@ class Player(Entity):
             self.velocity = pygame.Vector2(0, 0)
             self.moving = False
 
-    def render(self, surface: pygame.Surface, camera: Camera) -> None:
+    def move_waypoints(self, dt: float):
+        if self.waypoint_wait_time != 0:
+            self.waypoint_wait_time -= dt
+            if self.waypoint_wait_time < 0:
+                self.waypoint_wait_time = 0
+
+        if self.current_route is not None and self.waypoint_wait_time == 0:
+            dx: int = int(pygame.math.clamp(
+                self.routes.get(self.current_route).waypoints[self.route_waypoint].pos.x - self.grid_pos.x, -1, 1))
+            dy: int = int(pygame.math.clamp(
+                self.routes.get(self.current_route).waypoints[self.route_waypoint].pos.y - self.grid_pos.y, -1, 1))
+
+            if dx != 0:
+                dy = 0
+
+            if dx != 0 or dy != 0:
+                self.velocity = pygame.Vector2(dx, dy)
+                self.facing = self.routes.get(self.current_route).waypoints[self.route_waypoint].face_dir
+                self.moving = True
+                self.move_time = 0.0
+            else:
+                self.waypoint_wait_time = self.routes.get(self.current_route).waypoints[self.route_waypoint].wait
+                self.route_waypoint += 1
+                if self.route_waypoint >= len(self.routes.get(self.current_route).waypoints):
+                    self.route_waypoint = 0
+                    self.current_route = None
+
+    def render(self, surface: pygame.Surface) -> None:
         centered: pygame.Vector2 = self.pos - self.sprite.dimensions / 2
-        surface.blit(self.sprite.get() or AssetManager.NULL_IMAGE, camera.world_pos_to_view_pos(centered))
+        surface.blit(self.sprite.get() or AssetManager.NULL_IMAGE, Camera.world_pos_to_view_pos(centered))
