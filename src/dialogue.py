@@ -148,7 +148,8 @@ class Monologue:
             self.spoken += self.lines[self.line_index[0]].text[self.char_index[0]]
             self.char_index[0] += 1
             if self.speaking_sfx is not None:
-                self.speaking_sfx.play(maxtime=int(self.lines[self.line_index[0]].speed * 2000))
+                if self.speaking_sfx.get_num_channels() == 0 and self.spoken[-1].isalpha():
+                    self.speaking_sfx.play()
 
         self.awaiting_choice = len(self.options) > 0 and self.line_finished() and self.last_rendered_line()
 

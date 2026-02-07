@@ -1,252 +1,866 @@
 {
-  "void_color": { "r": 101, "g": 67, "b": 33, "a": 15 },
-  "player": {
-    "sprite": "player",
-    "move_duration": 0.15
-  },
-  "entity_lookup": [
-    {
-      "name": "big_man",
-      "sprite": "null",
-      "has_collision": true
-    }
-  ],
-  "static_entities": [],
-  "interactable_entities": [
-    {
-      "lookup_name": "big_man",
-      "grid_x": 5,
-      "grid_y": 4,
-      "dialogue": {
-        "start_monologue": 0,
-        "monologues": [
-          {
-            "speaker": "Esi",
-            "lines": ["Father. May I sit with you?"],
-            "char_speeds": [0.05],
-            "font": "snake64",
-            "options": [],
-            "speaker_image": null,
-            "next_monologue": 1
-          },
-          {
-            "speaker": "Big Man",
-            "lines": ["You never need to ask. Sit."],
-            "char_speeds": [0.05],
-            "font": "snake64",
-            "options": [],
-            "speaker_image": "big_man_portait",
-            "next_monologue": 2
-          },
-          {
-            "speaker": "Esi",
-            "lines": ["The village is restless. Why?"],
-            "char_speeds": [0.05],
-            "font": "snake64",
-            "options": [],
-            "speaker_image": null,
-            "next_monologue": 3
-          },
-          {
-            "speaker": "Big Man",
-            "lines": ["They are listening for news they already expect."],
-            "char_speeds": [0.05],
-            "font": "snake64",
-            "options": [],
-            "speaker_image": "big_man_portait",
-            "next_monologue": 4
-          },
-          {
-            "speaker": "Esi",
-            "lines": ["What news?"],
-            "char_speeds": [0.05],
-            "font": "snake64",
-            "options": [],
-            "speaker_image": null,
-            "next_monologue": 5
-          },
-          {
-            "speaker": "Big Man",
-            "lines": [
-              "The northern villages are breaking."
+    "void_color": { "r": 101, "g": 67, "b": 33, "a": 15 },
+    "bounds": { "x": 100, "y": 100 },
+    "background_music": {
+		"identifier": "esi_theme",
+		"volume": 0.3
+	},
+
+    "map_elements": [
+
+	],
+
+    "entity_lookup": [
+        {
+			"id": "player",
+			"sprite": "player",
+			"default_animation": "idle_down",
+			"animation_frame_time": 0.5,
+			"collision": true
+		},
+		{
+			"id": "big_man",
+			"sprite": "null",
+			"default_animation": "idle_down",
+			"animation_frame_time": 10,
+			"collision": true
+		}
+	],
+
+    "player": {
+		"lookup": "player",
+		"fallback_spawn": { "x": 0, "y": 0 },
+        "move_duration": 0.15
+	},
+
+    "entities": [
+        {
+            "id": "big_man",
+            "lookup": "big_man",
+            "spawn": { "x": 5, "y": 4 },
+            "conditions": {
+				"all": [],
+				"any": [],
+				"not": []
+			},
+
+            "routes": [
+
             ],
-            "char_speeds": [0.05],
-            "font": "snake64",
-            "options": [],
-            "speaker_image": "big_man_portait",
-            "next_monologue": 6
-          },
-          {
-            "speaker": "Big Man",
-            "lines": [
-              "Too many wars, too many prisoners."
-            ],
-            "char_speeds": [0.05],
-            "font": "snake64",
-            "options": [],
-            "speaker_image": "big_man_portait",
-            "next_monologue": 7
-          },
-          {
-            "speaker": "Esi",
-            "lines": ["The white men?"],
-            "char_speeds": [0.05],
-            "font": "snake64",
-            "options": [],
-            "speaker_image": null,
-            "next_monologue": 8
-          },
-          {
-            "speaker": "Big Man",
-            "lines": [
-              "Yes. They trade guns for people."
-            ],
-            "char_speeds": [0.05],
-            "font": "snake64",
-            "options": [],
-            "speaker_image": "big_man_portait",
-            "next_monologue": 9
-          },
-          {
-            "speaker": "Esi",
-            "lines": ["Why do our people agree to this?"],
-            "char_speeds": [0.05],
-            "font": "snake64",
-            "options": [],
-            "speaker_image": null,
-            "next_monologue": 10
-          },
-          {
-            "speaker": "Big Man",
-            "lines": [
-              "Because refusing costs more than agreeing."
-            ],
-            "char_speeds": [0.05],
-            "font": "snake64",
-            "options": [],
-            "speaker_image": "big_man_portait",
-            "next_monologue": 11
-          },
-          {
-            "speaker": "Esi",
-            "lines": ["And us?"],
-            "char_speeds": [0.05],
-            "font": "snake64",
-            "options": [],
-            "speaker_image": null,
-            "next_monologue": 12
-          },
-          {
-            "speaker": "Big Man",
-            "lines": [
-              "We have stayed strong by choosing our battles carefully."
-            ],
-            "char_speeds": [0.05],
-            "font": "snake64",
-            "options": [],
-            "speaker_image": "big_man_portait",
-            "next_monologue": 13
-          },
-          {
-            "speaker": "Esi",
-            "lines": ["Is that why people call you Big Man?"],
-            "char_speeds": [0.05],
-            "font": "snake64",
-            "options": [],
-            "speaker_image": null,
-            "next_monologue": 14
-          },
-          {
-            "speaker": "Big Man",
-            "lines": [
-              "They call me that because I learned when to bend."
-            ],
-            "char_speeds": [0.05],
-            "font": "snake64",
-            "options": [],
-            "speaker_image": "big_man_portait",
-            "next_monologue": 15
-          },
-          {
-            "speaker": "Esi",
-            "lines": ["Are we in danger?"],
-            "char_speeds": [0.05],
-            "font": "snake64",
-            "options": [],
-            "speaker_image": null,
-            "next_monologue": 16
-          },
-          {
-            "speaker": "Big Man",
-            "lines": [
-              "Danger is always nearby. Today it has not chosen us."
-            ],
-            "char_speeds": [0.15],
-            "font": "snake64",
-            "options": [],
-            "speaker_image": "big_man_portait",
-            "next_monologue": 17
-          },
-          {
-            "speaker": "Esi",
-            "lines": ["And tomorrow?"],
-            "char_speeds": [0.05],
-            "font": "snake64",
-            "options": [],
-            "speaker_image": null,
-            "next_monologue": 18
-          },
-          {
-            "speaker": "Big Man",
-            "lines": ["Tomorrow is why we stay alert, not afraid."],
-            "char_speeds": [0.05],
-            "font": "snake64",
-            "options": [],
-            "speaker_image": "big_man_portait",
-            "next_monologue": 19
-          },
-          {
-            "speaker": "Esi",
-            "lines": ["If something happens... what should I do?"],
-            "char_speeds": [0.05],
-            "font": "snake64",
-            "options": [],
-            "speaker_image": null,
-            "next_monologue": 20
-          },
-          {
-            "speaker": "Big Man",
-            "lines": [
-              "Make your decisions carefully."
-            ],
-            "char_speeds": [0.05],
-            "font": "snake64",
-            "options": [],
-            "speaker_image": "big_man_portait",
-            "next_monologue": 21
-          },
-          {
-            "speaker": "Esi",
-            "lines": ["I will."],
-            "char_speeds": [0.05],
-            "font": "snake64",
-            "options": [],
-            "speaker_image": null,
-            "next_monologue": 22
-          },
-          {
-            "speaker": "Big Man",
-            "lines": [
-              "Good. Knowing what is happening is how people survive longer."
-            ],
-            "char_speeds": [0.05],
-            "font": "snake64",
-            "options": [],
-            "speaker_image": "big_man_portait",
-            "next_monologue": null
-          }
-        ]
-      }
-    }
-  ]
+
+            "dialogues": [
+                {
+                    "id": "come_here",
+                    "conditions": {
+                        "all": [],
+                        "any": [],
+                        "not": ["INTRO_BIG_MAN_COME_HERE"]
+                    },
+
+                    "start_monologue": [
+                        {
+                            "id": "bm:come-here",
+                            "conditions": {
+                                "all": [],
+                                "any": [],
+                                "not": []
+                            }
+                        }
+                    ],
+
+                    "monologues": [
+                        {
+                            "id": "bm:come-here",
+                            "conditions": {
+                                "all": [],
+                                "any": [],
+                                "not": []
+                            },
+                            "alt_monologue": "",
+
+                            "speaker": "big man",
+                            "lines": [
+                                {
+                                    "text": "Esi. ",
+                                    "char_time": 0.05
+                                },
+                                {
+                                    "text": "You wanted to speak with me?",
+                                    "char_time": 0.05
+                                }
+                            ],
+                            "font": "snake64",
+                            "speaker_image": "big_man_portrait",
+                            "speaking_sfx": "baritone_voice",
+                            "next_monologue": null,
+
+                            "set_route_on_reach": [],
+
+                            "dispatch_on_reach": [],
+
+                            "modify_flags_on_reach": [
+                                { "how": "add", "value": "INTRO_BIG_MAN_COME_HERE" }
+                            ],
+
+                            "options": []
+                        }
+                    ]
+                },
+                {
+                    "id": "main",
+					"conditions": {
+						"all": [],
+						"any": [],
+						"not": []
+					},
+
+					"start_monologue": [
+						{
+							"id": "esi:sit?",
+							"conditions": {
+								"all": [],
+								"any": [],
+								"not": []
+							}
+						}
+					],
+
+                    "monologues": [
+						{
+							"id": "esi:sit?",
+							"conditions": {
+								"all": [],
+								"any": [],
+								"not": []
+							},
+							"alt_monologue": "",
+
+							"speaker": "you",
+							"lines": [
+								{
+									"text": "Father, ",
+									"char_time": 0.05
+								},
+                                {
+                                    "text": "may I sit with you?",
+                                    "char_time": 0.05
+                                }
+							],
+							"font": "snake64",
+							"speaker_image": "",
+							"speaking_sfx": "alto_voice",
+							"next_monologue": "bm:sit",
+
+							"set_route_on_reach": [],
+
+							"dispatch_on_reach": [],
+
+                            "modify_flags_on_reach": [],
+
+							"options": []
+						},
+                        {
+							"id": "bm:sit",
+							"conditions": {
+								"all": [],
+								"any": [],
+								"not": []
+							},
+							"alt_monologue": "",
+
+							"speaker": "big man",
+							"lines": [
+								{
+									"text": "You never need to ask. ",
+									"char_time": 0.05
+								},
+                                {
+                                    "text": "Sit.",
+                                    "char_time": 0.05
+                                }
+							],
+							"font": "snake64",
+							"speaker_image": "big_man_portrait",
+							"speaking_sfx": "baritone_voice",
+							"next_monologue": "esi:restless",
+
+							"set_route_on_reach": [],
+
+							"dispatch_on_reach": [],
+
+                            "modify_flags_on_reach": [],
+
+							"options": []
+						},
+                        {
+							"id": "esi:restless",
+							"conditions": {
+								"all": [],
+								"any": [],
+								"not": []
+							},
+							"alt_monologue": "",
+
+							"speaker": "you",
+							"lines": [
+								{
+									"text": "The village is restless. ",
+									"char_time": 0.05
+								},
+                                {
+									"text": "Why?",
+									"char_time": 0.05
+								}
+							],
+							"font": "snake64",
+							"speaker_image": "",
+							"speaking_sfx": "alto_voice",
+							"next_monologue": "bm:news",
+
+							"set_route_on_reach": [],
+
+							"dispatch_on_reach": [],
+
+                            "modify_flags_on_reach": [],
+
+							"options": []
+						},
+                        {
+							"id": "bm:news",
+							"conditions": {
+								"all": [],
+								"any": [],
+								"not": []
+							},
+							"alt_monologue": "",
+
+							"speaker": "big man",
+							"lines": [
+								{
+									"text": "They are listening for news they already expect.",
+									"char_time": 0.025
+								}
+							],
+							"font": "snake64",
+							"speaker_image": "big_man_portrait",
+							"speaking_sfx": "baritone_voice",
+							"next_monologue": "esi:news?",
+
+							"set_route_on_reach": [],
+
+							"dispatch_on_reach": [],
+
+                            "modify_flags_on_reach": [],
+
+							"options": []
+						},
+                        {
+							"id": "esi:news?",
+							"conditions": {
+								"all": [],
+								"any": [],
+								"not": []
+							},
+							"alt_monologue": "",
+
+							"speaker": "you",
+							"lines": [
+								{
+									"text": "What news?",
+									"char_time": 0.05
+								}
+							],
+							"font": "snake64",
+							"speaker_image": "",
+							"speaking_sfx": "alto_voice",
+							"next_monologue": "bm:villages-breaking",
+
+							"set_route_on_reach": [],
+
+							"dispatch_on_reach": [],
+
+                            "modify_flags_on_reach": [],
+
+							"options": []
+						},
+                        {
+							"id": "bm:villages-breaking",
+							"conditions": {
+								"all": [],
+								"any": [],
+								"not": []
+							},
+							"alt_monologue": "",
+
+							"speaker": "big man",
+							"lines": [
+								{
+									"text": "The northern villages are breaking.",
+									"char_time": 0.05
+								}
+							],
+							"font": "snake64",
+							"speaker_image": "big_man_portrait",
+							"speaking_sfx": "baritone_voice",
+							"next_monologue": "bm:too-many",
+
+							"set_route_on_reach": [],
+
+							"dispatch_on_reach": [],
+
+                            "modify_flags_on_reach": [],
+
+							"options": []
+						},
+                        {
+							"id": "bm:too-many",
+							"conditions": {
+								"all": [],
+								"any": [],
+								"not": []
+							},
+							"alt_monologue": "",
+
+							"speaker": "big man",
+							"lines": [
+								{
+									"text": "Too many wars, too many prisoners.",
+									"char_time": 0.05
+								}
+							],
+							"font": "snake64",
+							"speaker_image": "big_man_portrait",
+							"speaking_sfx": "baritone_voice",
+							"next_monologue": "esi:white-men?",
+
+							"set_route_on_reach": [],
+
+							"dispatch_on_reach": [],
+
+                            "modify_flags_on_reach": [],
+
+							"options": []
+						},
+                        {
+							"id": "esi:white-men?",
+							"conditions": {
+								"all": [],
+								"any": [],
+								"not": []
+							},
+							"alt_monologue": "",
+
+							"speaker": "you",
+							"lines": [
+								{
+									"text": "The white men?",
+									"char_time": 0.05
+								}
+							],
+							"font": "snake64",
+							"speaker_image": "",
+							"speaking_sfx": "alto_voice",
+							"next_monologue": "bm:white-men-yes",
+
+							"set_route_on_reach": [],
+
+							"dispatch_on_reach": [],
+
+                            "modify_flags_on_reach": [],
+
+							"options": []
+						},
+                        {
+							"id": "bm:white-men-yes",
+							"conditions": {
+								"all": [],
+								"any": [],
+								"not": []
+							},
+							"alt_monologue": "",
+
+							"speaker": "big man",
+							"lines": [
+								{
+									"text": "Yes.",
+									"char_time": 0.1
+								},
+                                {
+									"text": "They trade guns for people.",
+									"char_time": 0.05
+								}
+							],
+							"font": "snake64",
+							"speaker_image": "big_man_portrait",
+							"speaking_sfx": "baritone_voice",
+							"next_monologue": "esi:why-agree?",
+
+							"set_route_on_reach": [],
+
+							"dispatch_on_reach": [],
+
+                            "modify_flags_on_reach": [],
+
+							"options": []
+						},
+                        {
+							"id": "esi:why-agree?",
+							"conditions": {
+								"all": [],
+								"any": [],
+								"not": []
+							},
+							"alt_monologue": "",
+
+							"speaker": "you",
+							"lines": [
+								{
+									"text": "Why do our people agree to this?",
+									"char_time": 0.05
+								}
+							],
+							"font": "snake64",
+							"speaker_image": "",
+							"speaking_sfx": "alto_voice",
+							"next_monologue": "bm:no-option",
+
+							"set_route_on_reach": [],
+
+							"dispatch_on_reach": [],
+
+                            "modify_flags_on_reach": [],
+
+							"options": []
+						},
+                        {
+							"id": "bm:no-option",
+							"conditions": {
+								"all": [],
+								"any": [],
+								"not": []
+							},
+							"alt_monologue": "",
+
+							"speaker": "big man",
+							"lines": [
+								{
+									"text": "Because refusing costs more than agreeing.",
+									"char_time": 0.05
+								}
+							],
+							"font": "snake64",
+							"speaker_image": "big_man_portrait",
+							"speaking_sfx": "baritone_voice",
+							"next_monologue": "esi:us?",
+
+							"set_route_on_reach": [],
+
+							"dispatch_on_reach": [],
+
+                            "modify_flags_on_reach": [],
+
+							"options": []
+						},
+                        {
+							"id": "esi:us?",
+							"conditions": {
+								"all": [],
+								"any": [],
+								"not": []
+							},
+							"alt_monologue": "",
+
+							"speaker": "you",
+							"lines": [
+								{
+									"text": "And us?",
+									"char_time": 0.075
+								}
+							],
+							"font": "snake64",
+							"speaker_image": "",
+							"speaking_sfx": "alto_voice",
+							"next_monologue": "bm:stayed-strong",
+
+							"set_route_on_reach": [],
+
+							"dispatch_on_reach": [],
+
+                            "modify_flags_on_reach": [],
+
+							"options": []
+						},
+                        {
+							"id": "bm:stayed-strong",
+							"conditions": {
+								"all": [],
+								"any": [],
+								"not": []
+							},
+							"alt_monologue": "",
+
+							"speaker": "big man",
+							"lines": [
+								{
+									"text": "We have stayed strong by choosing our battles carefully.",
+									"char_time": 0.05
+								}
+							],
+							"font": "snake64",
+							"speaker_image": "big_man_portrait",
+							"speaking_sfx": "baritone_voice",
+							"next_monologue": "esi:big-man?",
+
+							"set_route_on_reach": [],
+
+							"dispatch_on_reach": [],
+
+                            "modify_flags_on_reach": [],
+
+							"options": []
+						},
+                        {
+							"id": "esi:big-man?",
+							"conditions": {
+								"all": [],
+								"any": [],
+								"not": []
+							},
+							"alt_monologue": "",
+
+							"speaker": "you",
+							"lines": [
+								{
+									"text": "Is that why they call you Big Man?",
+									"char_time": 0.05
+								}
+							],
+							"font": "snake64",
+							"speaker_image": "",
+							"speaking_sfx": "alto_voice",
+							"next_monologue": "bm:bend",
+
+							"set_route_on_reach": [],
+
+							"dispatch_on_reach": [],
+
+                            "modify_flags_on_reach": [],
+
+							"options": []
+						},
+                        {
+							"id": "bm:bend",
+							"conditions": {
+								"all": [],
+								"any": [],
+								"not": []
+							},
+							"alt_monologue": "",
+
+							"speaker": "big man",
+							"lines": [
+								{
+									"text": "They call me that because I learned when to bend.",
+									"char_time": 0.05
+								}
+							],
+							"font": "snake64",
+							"speaker_image": "big_man_portrait",
+							"speaking_sfx": "baritone_voice",
+							"next_monologue": "esi:danger?",
+
+							"set_route_on_reach": [],
+
+							"dispatch_on_reach": [],
+
+                            "modify_flags_on_reach": [],
+
+							"options": []
+						},
+                        {
+							"id": "esi:danger?",
+							"conditions": {
+								"all": [],
+								"any": [],
+								"not": []
+							},
+							"alt_monologue": "",
+
+							"speaker": "you",
+							"lines": [
+								{
+									"text": "Are we in danger?",
+									"char_time": 0.05
+								}
+							],
+							"font": "snake64",
+							"speaker_image": "",
+							"speaking_sfx": "alto_voice",
+							"next_monologue": "bm:not-today",
+
+							"set_route_on_reach": [],
+
+							"dispatch_on_reach": [],
+
+                            "modify_flags_on_reach": [],
+
+							"options": []
+						},
+                        {
+							"id": "bm:not-today",
+							"conditions": {
+								"all": [],
+								"any": [],
+								"not": []
+							},
+							"alt_monologue": "",
+
+							"speaker": "big man",
+							"lines": [
+								{
+									"text": "Danger is always nearby. ",
+									"char_time": 0.03
+								},
+                                {
+									"text": "Today it has not chosen us.",
+									"char_time": 0.05
+								}
+							],
+							"font": "snake64",
+							"speaker_image": "big_man_portrait",
+							"speaking_sfx": "baritone_voice",
+							"next_monologue": "esi:tomorrow?",
+
+							"set_route_on_reach": [],
+
+							"dispatch_on_reach": [],
+
+                            "modify_flags_on_reach": [],
+
+							"options": []
+						},
+                        {
+							"id": "esi:tomorrow?",
+							"conditions": {
+								"all": [],
+								"any": [],
+								"not": []
+							},
+							"alt_monologue": "",
+
+							"speaker": "you",
+							"lines": [
+								{
+									"text": "And tomorrow?",
+									"char_time": 0.06
+								}
+							],
+							"font": "snake64",
+							"speaker_image": "",
+							"speaking_sfx": "alto_voice",
+							"next_monologue": "bm:alert",
+
+							"set_route_on_reach": [],
+
+							"dispatch_on_reach": [],
+
+                            "modify_flags_on_reach": [],
+
+							"options": []
+						},
+                        {
+							"id": "bm:alert",
+							"conditions": {
+								"all": [],
+								"any": [],
+								"not": []
+							},
+							"alt_monologue": "",
+
+							"speaker": "big man",
+							"lines": [
+								{
+									"text": "Tomorrow is why we stay alert, ",
+									"char_time": 0.05
+								},
+                                {
+									"text": "not afraid.",
+									"char_time": 0.05
+								}
+							],
+							"font": "snake64",
+							"speaker_image": "big_man_portrait",
+							"speaking_sfx": "baritone_voice",
+							"next_monologue": "esi:if?",
+
+							"set_route_on_reach": [],
+
+							"dispatch_on_reach": [],
+
+                            "modify_flags_on_reach": [],
+
+							"options": []
+						},
+                        {
+							"id": "esi:if?",
+							"conditions": {
+								"all": [],
+								"any": [],
+								"not": []
+							},
+							"alt_monologue": "",
+
+							"speaker": "you",
+							"lines": [
+								{
+									"text": "If something happens",
+									"char_time": 0.05
+								},
+								{
+									"text": "... ",
+									"char_time": 0.2
+								},
+                                {
+                                    "text": "what should I do?",
+                                    "char_time": 0.08
+                                }
+							],
+							"font": "snake64",
+							"speaker_image": "",
+							"speaking_sfx": "alto_voice",
+							"next_monologue": "bm:decisions",
+
+							"set_route_on_reach": [],
+
+							"dispatch_on_reach": [],
+
+                            "modify_flags_on_reach": [],
+
+							"options": []
+						},
+                        {
+							"id": "bm:decisions",
+							"conditions": {
+								"all": [],
+								"any": [],
+								"not": []
+							},
+							"alt_monologue": "",
+
+							"speaker": "big man",
+							"lines": [
+								{
+									"text": "Make your decisions carefully.",
+									"char_time": 0.05
+								}
+							],
+							"font": "snake64",
+							"speaker_image": "big_man_portrait",
+							"speaking_sfx": "baritone_voice",
+							"next_monologue": "esi:i-will",
+
+							"set_route_on_reach": [],
+
+							"dispatch_on_reach": [],
+
+                            "modify_flags_on_reach": [],
+
+							"options": []
+						},
+                        {
+							"id": "esi:i-will",
+							"conditions": {
+								"all": [],
+								"any": [],
+								"not": []
+							},
+							"alt_monologue": "",
+
+							"speaker": "you",
+							"lines": [
+								{
+									"text": "I will.",
+									"char_time": 0.1
+								}
+							],
+							"font": "snake64",
+							"speaker_image": "",
+							"speaking_sfx": "alto_voice",
+							"next_monologue": "bm:survive",
+
+							"set_route_on_reach": [],
+
+							"dispatch_on_reach": [],
+
+                            "modify_flags_on_reach": [],
+
+							"options": []
+						},
+                        {
+							"id": "bm:survive",
+							"conditions": {
+								"all": [],
+								"any": [],
+								"not": []
+							},
+							"alt_monologue": "",
+
+							"speaker": "big man",
+							"lines": [
+								{
+									"text": "Good. ",
+									"char_time": 0.05
+								},
+                                {
+									"text": "Knowing what is happening is how people survive longer.",
+									"char_time": 0.05
+								}
+							],
+							"font": "snake64",
+							"speaker_image": "big_man_portrait",
+							"speaking_sfx": "baritone_voice",
+							"next_monologue": null,
+
+							"set_route_on_reach": [],
+
+							"dispatch_on_reach": [],
+
+                            "modify_flags_on_reach": [],
+
+							"options": []
+						}
+                    ]
+                }
+            ]
+        }
+    ],
+
+    "triggers": [
+		{
+			"identifier": "big man wants to talk",
+			"disabled": false,
+			"once": true,
+			"catch": [
+				{
+					"name": "on_scene_enter"
+				}
+			],
+			"dispatch": [
+				{
+					"name": "start_entity_dialogue",
+					"entity_id": "big_man",
+                    "dialogue_id": "come_here",
+					"wait": 0.5
+				}
+			]
+		}
+	],
+
+	"entrances": [
+
+	],
+
+    "exits": [
+
+	]
 }

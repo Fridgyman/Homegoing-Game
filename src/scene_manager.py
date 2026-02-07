@@ -394,6 +394,7 @@ class SceneManager:
     def __init__(self, scene_guide: str):
         self.scenes: dict[str, Scene] = {}
         self.current_scene: str = ""
+        self.start_scene: str = ""
 
         self.fade = 0
         self.fading = 0
@@ -404,7 +405,8 @@ class SceneManager:
         with open(scene_guide, "r") as file:
             obj = json.load(file)
 
-        for scene_obj in obj.get("esi", {}).get("scenes", []):
+        self.start_scene = obj.get("start_scene", "")
+        for scene_obj in obj.get("scenes", []):
             with open(scene_obj.get("path"), "r") as file:
                 scene_json = json.load(file)
             self.add_scene(scene_obj.get("name"), parse_scene(scene_json))

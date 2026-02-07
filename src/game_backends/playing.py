@@ -11,7 +11,7 @@ class PlayingBackend(Backend):
     def init(self, game) -> None:
         if not self.is_setup:
             self.is_setup = True
-            game.scene_manager.load_scene("test", "", pygame.Vector2(0, 1))
+            game.scene_manager.load_scene(game.scene_manager.start_scene, "", pygame.Vector2(0, 1))
         else:
             game.scene_manager.load_scene(game.scene_manager.current_scene, "", pygame.Vector2(0, 1), True)
 

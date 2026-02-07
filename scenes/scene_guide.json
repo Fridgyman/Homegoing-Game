@@ -1,10 +1,7 @@
 {
-  "esi": {
-    "start_scene": "test",
+    "start_scene": "start",
     "scenes": [
-      { "name": "test", "path": "scenes/esi/test.json" },
-      { "name": "test2", "path": "scenes/esi/test2.json" }
+        { "name": "start", "path": "scenes/esi/esi_intro.json" }
     ]
-  }
 } 
 

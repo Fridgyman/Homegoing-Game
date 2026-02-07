@@ -109,7 +109,8 @@ class Entity:
                 for map_element in map_elements:
                     if map_element.get_collision(rect):
                         if self.current_route is not None:
-                            self.grid_pos = self.routes.get(self.current_route).waypoints[self.route_waypoint].pos
+                            self.grid_pos = \
+                                self.routes.get(self.current_route).waypoints[self.route_waypoint].pos.copy()
                             self.pos = self.grid_pos * Config.TILE_SIZE
                         self.moving = False
                         self.velocity = pygame.Vector2(0, 0)

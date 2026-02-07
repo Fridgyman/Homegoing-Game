@@ -1,5 +1,3 @@
-import enum
-
 import pygame
 
 from src.camera import Camera
@@ -13,14 +11,9 @@ from src.player import Player
 from src.scene_in_out import SceneEntrance, SceneExit
 from src.trigger import Trigger
 from src.ui_manager import UIManager
+from src.event import SceneState
 
 BACKGROUND_MUSIC_FADE_MS = 1000
-
-class SceneState(enum.Enum):
-    ENTERING = 0
-    ENTERED = 1
-    EXITING = 2
-    EXITED = 3
 
 class Scene:
     def __init__(self, void_color: tuple[int, int, int, int], bounds: pygame.Vector2,
@@ -158,6 +151,7 @@ class Scene:
             if self.entering_through.complete:
                 self.entering_through.complete = False
                 self.entering_through = None
+                self.state = SceneState.ENTERED
 
         elif self.exiting_through is not None:
             self.exiting_through.update(manager, dt)
