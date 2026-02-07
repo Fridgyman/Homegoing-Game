@@ -121,7 +121,7 @@ def parse_dispatch(dispatch_obj: dict) -> DispatchEvent | None:
                 entity_id=dispatch_obj.get("entity_id", ""),
             )
         case "move_player":
-            waypoints: dict = dispatch_obj.get("waypoints")
+            waypoints: list = dispatch_obj.get("waypoints", [])
             event = MovePlayer(
                 parse_entity_route({"waypoints": waypoints})
             )
